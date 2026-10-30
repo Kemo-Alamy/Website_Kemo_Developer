@@ -1,4 +1,4 @@
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyDZpKG0OSqUrkpTg_kR8FzNZb5Obp8rVDY",
   authDomain: "kemo-developer.firebaseapp.com",
   projectId: "kemo-developer",
