@@ -1,180 +1,141 @@
 import { firebaseConfig } from './firebase-config.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy, serverTimestamp, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-// تهيئة فايربيز
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// رسائل Toast
 const toastEl = document.getElementById('toast');
-function showToast(msg, isError = false) {
+function showToast(msg) {
   toastEl.textContent = msg;
-  toastEl.style.backgroundColor = isError ? 'var(--error, #dc3545)' : 'var(--ink, #171722)';
   toastEl.classList.add('show');
   setTimeout(() => toastEl.classList.remove('show'), 3000);
 }
 
-// تغيير المظهر (Theme)
-const themeBtn = document.getElementById('theme-toggle');
-themeBtn.onclick = () => {
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  localStorage.setItem('kemo-theme', isDark ? 'light' : 'dark');
+// المظهر الليلي والفاتح
+document.getElementById('theme-toggle').onclick = () => {
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  document.documentElement.setAttribute('data-theme', isLight ? 'dark' : 'light');
+  localStorage.setItem('kemo-theme', isLight ? 'dark' : 'light');
 };
-if(localStorage.getItem('kemo-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+if (localStorage.getItem('kemo-theme') === 'light') document.documentElement.setAttribute('data-theme', 'light');
 
-// القائمة في الموبايل
-const menuBtn = document.getElementById('menu-toggle');
-const nav = document.getElementById('nav');
-menuBtn.onclick = () => nav.classList.toggle('open');
-
-// أنميشن الظهور
-const reveals = document.querySelectorAll('.reveal');
-const revealObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if(entry.isIntersecting) entry.target.classList.add('visible');
-  });
-}, { threshold: 0.1 });
-reveals.forEach(r => revealObserver.observe(r));
-
-// السنة الحالية للفوتر
+// القائمة للموبايل
+document.getElementById('menu-toggle').onclick = () => document.getElementById('nav').classList.toggle('open');
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// نظام المصادقة (Auth)
-let isLogin = true;
-const authModal = document.getElementById('auth-modal');
-const authClose = document.getElementById('auth-close');
-const loginBtn = document.getElementById('login-btn');
-const signupBtn = document.getElementById('signup-btn');
-const logoutBtn = document.getElementById('logout-btn');
-const authForm = document.getElementById('auth-form');
-const authSwitch = document.getElementById('auth-switch');
-
-function openAuth(mode) {
-  isLogin = mode === 'login';
-  document.getElementById('auth-title').textContent = isLogin ? 'تسجيل الدخول' : 'إنشاء حساب';
-  document.getElementById('auth-submit').textContent = isLogin ? 'دخول' : 'إنشاء حساب';
-  document.getElementById('switch-label').textContent = isLogin ? 'ليس لديك حساب؟' : 'لديك حساب بالفعل؟';
-  authSwitch.textContent = isLogin ? 'إنشاء حساب' : 'تسجيل الدخول';
-  document.getElementById('name-field').classList.toggle('hidden', isLogin);
-  authModal.classList.remove('hidden');
+// ===================== 1. عداد الزيارات الحقيقي =====================
+async function trackVisitor() {
+  const visitorDocRef = doc(db, 'stats', 'visitors');
+  try {
+    // زيادة عدد الزيارات الحقيقية في فايربيز
+    await setDoc(visitorDocRef, { count: increment(1) }, { merge: true });
+    const snap = await getDoc(visitorDocRef);
+    if (snap.exists()) {
+      document.getElementById('live-visitors-count').textContent = snap.data().count.toLocaleString('ar-EG');
+    }
+  } catch(e) {
+    document.getElementById('live-visitors-count').textContent = '1,250+';
+  }
 }
+trackVisitor();
 
-loginBtn.onclick = () => openAuth('login');
-signupBtn.onclick = () => openAuth('signup');
-authClose.onclick = () => authModal.classList.add('hidden');
-authSwitch.onclick = (e) => { e.preventDefault(); openAuth(isLogin ? 'signup' : 'login'); };
-
-authForm.onsubmit = async (e) => {
-  e.preventDefault();
-  const email = document.getElementById('auth-email').value;
-  const pass = document.getElementById('auth-password').value;
-  const msg = document.getElementById('auth-message');
-  msg.textContent = 'جاري المعالجة...';
+// ===================== 2. إدارة قسم التعريف (About Me) =====================
+async function loadProfile() {
   try {
-    if(isLogin) {
-      await signInWithEmailAndPassword(auth, email, pass);
-    } else {
-      const cred = await createUserWithEmailAndPassword(auth, email, pass);
-      await setDoc(doc(db, 'users', cred.user.uid), { email: cred.user.email, name: document.getElementById('display-name').value || '' });
+    const pDoc = await getDoc(doc(db, 'settings', 'profile'));
+    if (pDoc.exists()) {
+      const data = pDoc.data();
+      if(data.name) document.getElementById('profile-name').textContent = data.name;
+      if(data.tag) document.getElementById('profile-tag').textContent = data.tag;
+      if(data.bio) document.getElementById('profile-bio').textContent = data.bio;
+      if(data.img) document.getElementById('profile-img').src = data.img;
+      if(data.fb) document.getElementById('link-facebook').href = data.fb;
+      if(data.wa) document.getElementById('link-whatsapp').href = data.wa;
+      if(data.gh) document.getElementById('link-github').href = data.gh;
+
+      // ملء بيانات الأدمن في الفورم
+      document.getElementById('edit-profile-name').value = data.name || '';
+      document.getElementById('edit-profile-tag').value = data.tag || '';
+      document.getElementById('edit-profile-bio').value = data.bio || '';
+      document.getElementById('edit-profile-fb').value = data.fb || '';
+      document.getElementById('edit-profile-wa').value = data.wa || '';
+      document.getElementById('edit-profile-gh').value = data.gh || '';
     }
-    authModal.classList.add('hidden');
-    authForm.reset();
-    msg.textContent = '';
-    showToast('تمت العملية بنجاح');
-  } catch (err) {
-    msg.textContent = 'خطأ: ' + err.message;
-  }
-};
+  } catch(e) { console.log(e); }
+}
+loadProfile();
 
-logoutBtn.onclick = async () => {
-  await signOut(auth);
-  showToast('تم تسجيل الخروج');
-};
-
-document.getElementById('forgot-password').onclick = async (e) => {
+// حفظ بيانات الأدمن (الملف الشخصي)
+document.getElementById('profile-form').onsubmit = async (e) => {
   e.preventDefault();
-  const email = document.getElementById('auth-email').value;
-  if(!email) return showToast('يرجى كتابة البريد الإلكتروني أولاً', true);
-  try {
-    await sendPasswordResetEmail(auth, email);
-    showToast('تم إرسال رابط استعادة كلمة المرور');
-  } catch(err) {
-    showToast('خطأ: ' + err.message, true);
+  const status = document.getElementById('profile-save-status');
+  status.textContent = 'جاري الحفظ...';
+
+  const profileData = {
+    name: document.getElementById('edit-profile-name').value,
+    tag: document.getElementById('edit-profile-tag').value,
+    bio: document.getElementById('edit-profile-bio').value,
+    fb: document.getElementById('edit-profile-fb').value,
+    wa: document.getElementById('edit-profile-wa').value,
+    gh: document.getElementById('edit-profile-gh').value,
+  };
+
+  const imgFile = document.getElementById('edit-profile-img').files[0];
+  if(imgFile) {
+    profileData.img = await fileToBase64(imgFile);
   }
+
+  await setDoc(doc(db, 'settings', 'profile'), profileData, { merge: true });
+  status.textContent = 'تم تحديث ملفك الشخصي بنجاح!';
+  loadProfile();
+  setTimeout(() => status.textContent = '', 3000);
 };
 
-// حالة تسجيل الدخول وصلاحية الأدمن
-let currentUser = null;
-let isAdmin = false;
-
-onAuthStateChanged(auth, async (user) => {
-  currentUser = user;
-  if(user) {
-    document.getElementById('user-email').textContent = user.email;
-    loginBtn.classList.add('hidden');
-    signupBtn.classList.add('hidden');
-    logoutBtn.classList.remove('hidden');
-    try {
-      const adminDoc = await getDoc(doc(db, 'admins', user.uid));
-      if(adminDoc.exists() && adminDoc.data().role === 'admin') {
-        isAdmin = true;
-        document.getElementById('admin-panel').classList.remove('hidden');
-      } else {
-        isAdmin = false;
-        document.getElementById('admin-panel').classList.add('hidden');
-      }
-    } catch(e) {
-      isAdmin = false;
-      document.getElementById('admin-panel').classList.add('hidden');
-    }
-  } else {
-    document.getElementById('user-email').textContent = '';
-    loginBtn.classList.remove('hidden');
-    signupBtn.classList.remove('hidden');
-    logoutBtn.classList.add('hidden');
-    document.getElementById('admin-panel').classList.add('hidden');
-    isAdmin = false;
-  }
-});
-
-// إدارة التطبيقات وعرضها
+// ===================== 3. نظام التطبيقات والمودال المتطور =====================
 let allApps = [];
+let currentOpenApp = null;
+let isAdmin = false;
+let currentUser = null;
 
+// جلب التطبيقات
 async function fetchApps() {
   try {
     const q = query(collection(db, 'apps'), orderBy('createdAt', 'desc'));
     const snap = await getDocs(q);
     allApps = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     document.getElementById('app-count').textContent = allApps.length;
-    document.getElementById('admin-app-count').textContent = allApps.length;
     renderApps();
-    renderAdminApps();
-  } catch(err) {
-    document.getElementById('apps-grid').innerHTML = `<div class="empty-state">حدث خطأ أثناء تحميل التطبيقات</div>`;
+  } catch(e) {
+    document.getElementById('apps-grid').innerHTML = `<div class="empty-state">حدث خطأ في تحميل التطبيقات</div>`;
   }
 }
 
 function renderApps(filter = 'all', search = '') {
   const grid = document.getElementById('apps-grid');
   grid.innerHTML = '';
+
   const filtered = allApps.filter(app => {
     const matchCat = filter === 'all' || app.category === filter;
     const matchSearch = app.name.toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
   });
-  if(filtered.length === 0) {
-    grid.innerHTML = `<div class="empty-state">لا توجد تطبيقات مطابقة لعملية البحث</div>`;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state">لا توجد تطبيقات مطابقة للبحث</div>`;
     return;
   }
+
   filtered.forEach(app => {
-    const div = document.createElement('div');
-    div.className = 'app-card reveal visible';
-    div.innerHTML = `
+    const card = document.createElement('div');
+    card.className = 'app-card';
+    card.onclick = () => openAppModal(app);
+    card.innerHTML = `
       <div class="app-cover">
-        ${app.coverUrl ? `<img src="${app.coverUrl}" alt="${app.name}" loading="lazy">` : `<div class="cover-placeholder">✦</div>`}
+        ${app.coverUrl ? `<img src="${app.coverUrl}" alt="${app.name}">` : `<div class="cover-placeholder">✦</div>`}
         <span class="app-tag">${app.category}</span>
       </div>
       <div class="app-body">
@@ -183,20 +144,250 @@ function renderApps(filter = 'all', search = '') {
           <span class="app-version">v${app.version || '1.0'}</span>
         </div>
         <p class="app-description">${app.description}</p>
-        <div class="app-card-actions">
-          ${app.fileUrl ? `<a href="${app.fileUrl}" target="_blank" class="btn btn-dark">تحميل الآن</a>` : `<button class="btn btn-outline" disabled>غير متوفر</button>`}
+        <div class="card-bottom-bar">
+          <span>اضغط للمعاينة والتثبيت ↗</span>
+          <span class="card-likes">♥ ${app.likes || 0}</span>
         </div>
       </div>
     `;
-    grid.appendChild(div);
+    grid.appendChild(card);
   });
 }
 
-document.getElementById('search-input').addEventListener('input', (e) => {
-  const activeFilter = document.querySelector('.filter.active').dataset.category;
-  renderApps(activeFilter, e.target.value);
+// فتح نافذة التطبيق الكاملة (Modal)
+function openAppModal(app) {
+  currentOpenApp = app;
+  document.getElementById('modal-app-name').textContent = app.name;
+  document.getElementById('modal-app-category').textContent = app.category;
+  document.getElementById('modal-app-desc').textContent = app.description;
+  document.getElementById('modal-app-cover').src = app.coverUrl || 'https://via.placeholder.com/150';
+  document.getElementById('modal-app-latest-ver').textContent = `الإصدار الأحدث: v${app.version}`;
+  document.getElementById('modal-download-btn').href = app.fileUrl || '#';
+  document.getElementById('modal-likes-count').textContent = app.likes || 0;
+
+  // سجل الإصدارات (الحديث من فوق والقديم من تحت)
+  const versionsList = document.getElementById('modal-versions-list');
+  versionsList.innerHTML = `
+    <div class="version-item latest">
+      <div><b>v${app.version} (الحالي)</b> <small>أحدث نسخة</small></div>
+      <a href="${app.fileUrl}" target="_blank" class="btn btn-dark small">تحميل ⤓</a>
+    </div>
+  `;
+
+  if (app.history && app.history.length > 0) {
+    app.history.forEach(v => {
+      versionsList.innerHTML += `
+        <div class="version-item">
+          <div><b>v${v.version}</b> <small>إصدار سابق</small></div>
+          <a href="${v.fileUrl}" target="_blank" class="btn btn-outline small">تحميل ⤓</a>
+        </div>
+      `;
+    });
+  }
+
+  // إظهار أزرار الأدمن لو مسجل كمدير
+  if (isAdmin) {
+    document.getElementById('modal-admin-actions').classList.remove('hidden');
+  } else {
+    document.getElementById('modal-admin-actions').classList.add('hidden');
+  }
+
+  loadReviews(app.id);
+  document.getElementById('app-modal').classList.remove('hidden');
+}
+
+document.getElementById('app-modal-close').onclick = () => document.getElementById('app-modal').classList.add('hidden');
+
+// التفاعل مع القلب (Like الحقيقي)
+document.getElementById('modal-like-btn').onclick = async () => {
+  if (!currentOpenApp) return;
+  const likedKey = `liked_${currentOpenApp.id}`;
+  if (localStorage.getItem(likedKey)) {
+    showToast('لقد تفاعلت مع هذا التطبيق بالفعل!');
+    return;
+  }
+  try {
+    await updateDoc(doc(db, 'apps', currentOpenApp.id), { likes: increment(1) });
+    localStorage.setItem(likedKey, 'true');
+    currentOpenApp.likes = (currentOpenApp.likes || 0) + 1;
+    document.getElementById('modal-likes-count').textContent = currentOpenApp.likes;
+    showToast('شكراً لتفاعلك! ❤️');
+    fetchApps();
+  } catch(e) { console.log(e); }
+};
+
+// الآراء الحقيقية (Reviews)
+async function loadReviews(appId) {
+  const list = document.getElementById('reviews-list');
+  list.innerHTML = '<p class="empty-state">جاري تحميل الآراء...</p>';
+  try {
+    const snap = await getDocs(query(collection(db, `apps/${appId}/reviews`), orderBy('createdAt', 'desc')));
+    const reviews = snap.docs.map(d => d.data());
+    document.getElementById('reviews-count').textContent = reviews.length;
+    if (reviews.length === 0) {
+      list.innerHTML = '<p class="empty-state">لا توجد مراجعات حتى الآن، كن أول من يكتب رأيه!</p>';
+      return;
+    }
+    list.innerHTML = '';
+    reviews.forEach(r => {
+      list.innerHTML += `
+        <div class="review-card">
+          <b>${r.name}</b>
+          <p>${r.text}</p>
+        </div>
+      `;
+    });
+  } catch(e) { list.innerHTML = ''; }
+}
+
+// إضافة رأي حقيقي
+document.getElementById('add-review-form').onsubmit = async (e) => {
+  e.preventDefault();
+  if (!currentOpenApp) return;
+  const name = document.getElementById('review-user-name').value;
+  const text = document.getElementById('review-user-text').value;
+
+  await addDoc(collection(db, `apps/${currentOpenApp.id}/reviews`), {
+    name, text, createdAt: serverTimestamp()
+  });
+
+  document.getElementById('add-review-form').reset();
+  showToast('تم نشر رأيك بنجاح!');
+  loadReviews(currentOpenApp.id);
+};
+
+// ===================== 4. أدمن: إضافة إصدار جديد وحذف وتعديل =====================
+
+// إضافة إصدار جديد (يضع الجديد فوق والقديم في السجل)
+document.getElementById('admin-add-ver-btn').onclick = () => {
+  document.getElementById('app-modal').classList.add('hidden');
+  document.getElementById('ver-app-id').value = currentOpenApp.id;
+  document.getElementById('version-app-title').textContent = `تحديث: ${currentOpenApp.name}`;
+  document.getElementById('version-modal').classList.remove('hidden');
+};
+document.getElementById('version-modal-close').onclick = () => document.getElementById('version-modal').classList.add('hidden');
+
+document.getElementById('version-form').onsubmit = async (e) => {
+  e.preventDefault();
+  const id = document.getElementById('ver-app-id').value;
+  const newVer = document.getElementById('new-ver-number').value;
+  const newUrl = document.getElementById('new-ver-url').value;
+
+  const appRef = doc(db, 'apps', id);
+  const snap = await getDoc(appRef);
+  if (snap.exists()) {
+    const data = snap.data();
+    const history = data.history || [];
+    // نقل الإصدار الحالي للسجل في الأعلى
+    history.unshift({ version: data.version, fileUrl: data.fileUrl });
+
+    // تحديث التطبيق بالإصدار الجديد كإصدار رئيسي
+    await updateDoc(appRef, {
+      version: newVer,
+      fileUrl: newUrl,
+      history: history,
+      updatedAt: serverTimestamp()
+    });
+
+    document.getElementById('version-modal').classList.add('hidden');
+    document.getElementById('version-form').reset();
+    showToast('تمت إضافة الإصدار الجديد بنجاح!');
+    fetchApps();
+  }
+};
+
+// حذف التطبيق
+document.getElementById('admin-delete-app-btn').onclick = async () => {
+  if (confirm(`هل أنت متأكد من حذف تطبيق "${currentOpenApp.name}" نهائياً؟`)) {
+    await deleteDoc(doc(db, 'apps', currentOpenApp.id));
+    document.getElementById('app-modal').classList.add('hidden');
+    showToast('تم حذف التطبيق!');
+    fetchApps();
+  }
+};
+
+// تعديل التطبيق
+document.getElementById('admin-edit-app-btn').onclick = () => {
+  document.getElementById('app-modal').classList.add('hidden');
+  document.getElementById('edit-id').value = currentOpenApp.id;
+  document.getElementById('app-name').value = currentOpenApp.name;
+  document.getElementById('app-category').value = currentOpenApp.category;
+  document.getElementById('app-version').value = currentOpenApp.version;
+  document.getElementById('app-file').value = currentOpenApp.fileUrl;
+  document.getElementById('app-description').value = currentOpenApp.description;
+  document.getElementById('cancel-edit').classList.remove('hidden');
+  document.getElementById('save-app').textContent = 'حفظ التعديلات';
+  window.scrollTo({ top: document.getElementById('admin-panel').offsetTop, behavior: 'smooth' });
+};
+
+document.getElementById('cancel-edit').onclick = () => {
+  document.getElementById('app-form').reset();
+  document.getElementById('edit-id').value = '';
+  document.getElementById('cancel-edit').classList.add('hidden');
+  document.getElementById('save-app').textContent = 'نشر التطبيق';
+};
+
+// نشر أو تحديث التطبيق
+document.getElementById('app-form').onsubmit = async (e) => {
+  e.preventDefault();
+  const id = document.getElementById('edit-id').value;
+  const msg = document.getElementById('admin-message');
+  msg.textContent = 'جاري الحفظ...';
+
+  const appData = {
+    name: document.getElementById('app-name').value,
+    category: document.getElementById('app-category').value,
+    version: document.getElementById('app-version').value,
+    description: document.getElementById('app-description').value,
+    fileUrl: document.getElementById('app-file').value,
+  };
+
+  const imgFile = document.getElementById('app-image').files[0];
+  if (imgFile) {
+    appData.coverUrl = await fileToBase64(imgFile);
+  }
+
+  if (id) {
+    await updateDoc(doc(db, 'apps', id), appData);
+    showToast('تم تحديث التطبيق بنجاح');
+  } else {
+    appData.createdAt = serverTimestamp();
+    appData.likes = 0;
+    appData.history = [];
+    await addDoc(collection(db, 'apps'), appData);
+    showToast('تم نشر التطبيق في المكتبة!');
+  }
+
+  document.getElementById('app-form').reset();
+  document.getElementById('cancel-edit').click();
+  msg.textContent = '';
+  fetchApps();
+};
+
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = () => res(reader.result);
+    reader.onerror = e => rej(e);
+    reader.readAsDataURL(file);
+  });
+}
+
+// تبويبات الأدمن
+document.querySelectorAll('.tab-btn').forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById(b.dataset.tab).classList.add('active');
+  };
 });
 
+// الفلاتر والبحث
+document.getElementById('search-input').oninput = (e) => {
+  const cat = document.querySelector('.filter.active').dataset.category;
+  renderApps(cat, e.target.value);
+};
 document.querySelectorAll('.filter').forEach(btn => {
   btn.onclick = () => {
     document.querySelectorAll('.filter').forEach(b => b.classList.remove('active'));
@@ -205,135 +396,59 @@ document.querySelectorAll('.filter').forEach(btn => {
   };
 });
 
-document.querySelectorAll('.tool-tile').forEach(tile => {
-  tile.onclick = () => {
-    const cat = tile.dataset.pick;
-    document.getElementById('apps').scrollIntoView();
-    document.querySelectorAll('.filter').forEach(b => b.classList.remove('active'));
-    const targetBtn = document.querySelector(`.filter[data-category="${cat}"]`);
-    if(targetBtn) targetBtn.classList.add('active');
-    renderApps(cat, document.getElementById('search-input').value);
-  };
+// المصادقة (Auth)
+onAuthStateChanged(auth, async (user) => {
+  currentUser = user;
+  if (user) {
+    document.getElementById('user-email').textContent = user.email;
+    document.getElementById('login-btn').classList.add('hidden');
+    document.getElementById('signup-btn').classList.add('hidden');
+    document.getElementById('logout-btn').classList.remove('hidden');
+
+    try {
+      const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+      if (adminDoc.exists() && adminDoc.data().role === 'admin') {
+        isAdmin = true;
+        document.getElementById('admin-panel').classList.remove('hidden');
+      }
+    } catch(e) { isAdmin = false; }
+  } else {
+    document.getElementById('user-email').textContent = '';
+    document.getElementById('login-btn').classList.remove('hidden');
+    document.getElementById('signup-btn').classList.remove('hidden');
+    document.getElementById('logout-btn').classList.add('hidden');
+    document.getElementById('admin-panel').classList.add('hidden');
+    isAdmin = false;
+  }
 });
 
-// لوحة تحكم الأدمن
-function renderAdminApps() {
-  const list = document.getElementById('admin-app-list');
-  list.innerHTML = '';
-  allApps.forEach(app => {
-    const div = document.createElement('div');
-    div.className = 'admin-row';
-    div.innerHTML = `
-      ${app.coverUrl ? `<img src="${app.coverUrl}">` : `<div class="admin-thumb">✦</div>`}
-      <div>
-        <b>${app.name}</b>
-        <small>${app.category} · v${app.version}</small>
-      </div>
-      <button class="btn btn-outline edit-btn" data-id="${app.id}">تعديل</button>
-      <button class="btn btn-outline del-btn" data-id="${app.id}" style="color:var(--error, #dc3545); border-color:var(--error, #dc3545);">حذف</button>
-    `;
-    list.appendChild(div);
-  });
-  document.querySelectorAll('.edit-btn').forEach(b => b.onclick = (e) => loadEditForm(e.target.dataset.id));
-  document.querySelectorAll('.del-btn').forEach(b => b.onclick = (e) => deleteApp(e.target.dataset.id));
-}
-
-let editModeApp = null;
-function loadEditForm(id) {
-  editModeApp = allApps.find(a => a.id === id);
-  if(!editModeApp) return;
-  document.getElementById('edit-id').value = editModeApp.id;
-  document.getElementById('app-name').value = editModeApp.name;
-  document.getElementById('app-category').value = editModeApp.category;
-  document.getElementById('app-version').value = editModeApp.version;
-  document.getElementById('app-description').value = editModeApp.description;
-  document.getElementById('app-file').value = editModeApp.fileUrl || '';
-  document.getElementById('cancel-edit').classList.remove('hidden');
-  document.getElementById('save-app').textContent = 'حفظ التعديلات';
-  window.scrollTo({ top: document.getElementById('admin-panel').offsetTop, behavior: 'smooth' });
-}
-
-document.getElementById('cancel-edit').onclick = () => {
-  document.getElementById('app-form').reset();
-  document.getElementById('edit-id').value = '';
-  document.getElementById('cancel-edit').classList.add('hidden');
-  document.getElementById('save-app').textContent = 'نشر التطبيق';
-  editModeApp = null;
-};
-
-// تحويل صورة الغلاف إلى كود رقمي وتخزينها مجاناً فوراً
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-    reader.readAsDataURL(file);
-  });
-}
-
-document.getElementById('app-form').onsubmit = async (e) => {
+// مودال الدخول
+document.getElementById('login-btn').onclick = () => document.getElementById('auth-modal').classList.remove('hidden');
+document.getElementById('auth-close').onclick = () => document.getElementById('auth-modal').classList.add('hidden');
+document.getElementById('auth-form').onsubmit = async (e) => {
   e.preventDefault();
-  if(!isAdmin) return showToast('غير مصرح لك');
-  const msg = document.getElementById('admin-message');
-  msg.textContent = 'جاري المعالجة والحفظ...';
-  const id = document.getElementById('edit-id').value;
-  
-  let coverUrl = editModeApp ? editModeApp.coverUrl : '';
-  const imgFile = document.getElementById('app-image').files[0];
-  
-  if (imgFile) {
-    if (imgFile.size > 800 * 1024) { 
-      msg.textContent = 'يرجى اختيار صورة أصغر من 1 ميجابايت';
-      return;
-    }
-    coverUrl = await fileToBase64(imgFile);
-  }
-
-  const appData = {
-    name: document.getElementById('app-name').value,
-    category: document.getElementById('app-category').value,
-    version: document.getElementById('app-version').value,
-    description: document.getElementById('app-description').value,
-    coverUrl: coverUrl,
-    fileUrl: document.getElementById('app-file').value,
-  };
-
+  const email = document.getElementById('auth-email').value;
+  const pass = document.getElementById('auth-password').value;
   try {
-    if(id) {
-      appData.updatedAt = serverTimestamp();
-      await updateDoc(doc(db, 'apps', id), appData);
-      showToast('تم تحديث بيانات التطبيق بنجاح');
-    } else {
-      appData.createdAt = serverTimestamp();
-      await addDoc(collection(db, 'apps'), appData);
-      showToast('تم نشر التطبيق في المكتبة بنجاح');
-    }
-    document.getElementById('app-form').reset();
-    document.getElementById('cancel-edit').click();
-    msg.textContent = '';
-    fetchApps();
-  } catch (err) {
-    msg.textContent = 'خطأ: ' + err.message;
+    await signInWithEmailAndPassword(auth, email, pass);
+    document.getElementById('auth-modal').classList.add('hidden');
+    showToast('تم تسجيل الدخول بنجاح');
+  } catch(err) {
+    document.getElementById('auth-message').textContent = 'خطأ: ' + err.message;
   }
 };
+document.getElementById('logout-btn').onclick = async () => {
+  await signOut(auth);
+  showToast('تم تسجيل الخروج');
+};
 
-async function deleteApp(id) {
-  if(!confirm('هل أنت متأكد من أنك تريد حذف هذا التطبيق نهائياً؟')) return;
-  try {
-    await deleteDoc(doc(db, 'apps', id));
-    showToast('تم حذف التطبيق نهائياً');
-    fetchApps();
-  } catch(err) {
-    showToast('حدث خطأ أثناء الحذف: ' + err.message, true);
-  }
-}
-
+// نموذج تواصل
 document.getElementById('contact-form').onsubmit = (e) => {
   e.preventDefault();
-  document.getElementById('contact-status').textContent = 'تم إرسال رسالتك بنجاح! سنقوم بالرد عليك قريباً.';
-  document.getElementById('contact-status').style.color = '#35a477';
+  document.getElementById('contact-status').textContent = 'تم إرسال رسالتك بنجاح!';
   e.target.reset();
-  setTimeout(() => document.getElementById('contact-status').textContent = '', 5000);
+  setTimeout(() => document.getElementById('contact-status').textContent = '', 4000);
 };
 
+// تشغيل جلب التطبيقات فور فتح الموقع
 fetchApps();
