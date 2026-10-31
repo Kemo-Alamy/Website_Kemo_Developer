@@ -1,5 +1,5 @@
 export const firebaseConfig = {
-  apiKey: "AIzaSyDZpKG0OSqUrkpTg_kR8fNZb5Obp8rVDY",
+  apiKey: "yEzjER74k7dMURcoVaeeuHHfOl42",
   authDomain: "kemo-developer.firebaseapp.com",
   projectId: "kemo-developer",
   storageBucket: "kemo-developer.firebasestorage.app",
