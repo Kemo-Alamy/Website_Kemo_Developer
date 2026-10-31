@@ -99,16 +99,15 @@
   </div>
 
   <section id="admin-panel" class="admin-panel hidden">
-    <div class="admin-top"><div><span class="eyebrow">ADMIN WORKSPACE</span><h2>لوحة إدارة المحتوى</h2><p>أضف تطبيقاتك وارفع صور الغلاف وملفات التحميل.</p></div><span class="admin-badge">صلاحية أدمن</span></div>
+    <div class="admin-top"><div><span class="eyebrow">ADMIN WORKSPACE</span><h2>لوحة إدارة المحتوى</h2><p>أضف تطبيقاتك واختر صورة الغلاف وضع رابط التحميل المباشر.</p></div><span class="admin-badge">صلاحية أدمن</span></div>
     <form id="app-form" class="admin-form">
       <input id="edit-id" type="hidden">
       <label>اسم التطبيق<input id="app-name" required maxlength="80" placeholder="مثال: Kemo Tools"></label>
       <label>التصنيف<select id="app-category"><option>تطبيقات</option><option>ألعاب</option><option>أدوات</option></select></label>
       <label>رقم الإصدار<input id="app-version" maxlength="30" placeholder="1.0.0"></label>
-      <label>صورة الغلاف <input id="app-image" type="file" accept="image/png,image/jpeg,image/webp"></label>
-      <label>ملف التطبيق / اللعبة <input id="app-file" type="file" accept=".apk,.aab,.zip,.xapk,.apks,application/vnd.android.package-archive,application/zip"></label>
+      <label>صورة الغلاف (اختر من جهازك)<input id="app-image" type="file" accept="image/*"></label>
+      <label>رابط تحميل التطبيق / اللعبة<input id="app-file" type="url" required placeholder="رابط MediaFire أو Google Drive"></label>
       <label class="wide">وصف التطبيق<textarea id="app-description" required maxlength="500" rows="3" placeholder="اكتب وصفًا واضحًا للتطبيق..."></textarea></label>
-      <div class="upload-progress wide hidden" id="upload-progress"><div id="progress-bar"></div></div>
       <div class="admin-form-actions wide"><button class="btn btn-dark" id="save-app" type="submit">نشر التطبيق</button><button class="btn btn-outline hidden" id="cancel-edit" type="button">إلغاء التعديل</button><span id="admin-message" class="form-status"></span></div>
     </form>
     <div class="admin-list-head"><h3>التطبيقات المنشورة</h3><span id="admin-app-count">0</span></div><div id="admin-app-list" class="admin-app-list"></div>
