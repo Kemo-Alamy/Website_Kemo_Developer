@@ -2,12 +2,11 @@ import { firebaseConfig } from './firebase-config.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
+// تهيئة فايربيز
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 const toastEl = document.getElementById('toast');
 function showToast(msg, isError = false) {
@@ -17,6 +16,7 @@ function showToast(msg, isError = false) {
   setTimeout(() => toastEl.classList.remove('show'), 3000);
 }
 
+// تغيير المظهر (Theme)
 const themeBtn = document.getElementById('theme-toggle');
 themeBtn.onclick = () => {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -25,10 +25,12 @@ themeBtn.onclick = () => {
 };
 if(localStorage.getItem('kemo-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
 
+// القائمة في الموبايل
 const menuBtn = document.getElementById('menu-toggle');
 const nav = document.getElementById('nav');
 menuBtn.onclick = () => nav.classList.toggle('open');
 
+// أنميشن الظهور
 const reveals = document.querySelectorAll('.reveal');
 const revealObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
@@ -37,8 +39,10 @@ const revealObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.1 });
 reveals.forEach(r => revealObserver.observe(r));
 
+// السنة الحالية للفوتر
 document.getElementById('year').textContent = new Date().getFullYear();
 
+// نظام المصادقة (Auth)
 let isLogin = true;
 const authModal = document.getElementById('auth-modal');
 const authClose = document.getElementById('auth-close');
@@ -102,6 +106,7 @@ document.getElementById('forgot-password').onclick = async (e) => {
   }
 };
 
+// حالة تسجيل الدخول وصلاحية الأدمن
 let currentUser = null;
 let isAdmin = false;
 
@@ -112,7 +117,6 @@ onAuthStateChanged(auth, async (user) => {
     loginBtn.classList.add('hidden');
     signupBtn.classList.add('hidden');
     logoutBtn.classList.remove('hidden');
-    
     try {
       const adminDoc = await getDoc(doc(db, 'admins', user.uid));
       if(adminDoc.exists() && adminDoc.data().role === 'admin') {
@@ -136,6 +140,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
+// إدارة التطبيقات وعرضها
 let allApps = [];
 
 async function fetchApps() {
@@ -143,10 +148,8 @@ async function fetchApps() {
     const q = query(collection(db, 'apps'), orderBy('createdAt', 'desc'));
     const snap = await getDocs(q);
     allApps = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    
     document.getElementById('app-count').textContent = allApps.length;
     document.getElementById('admin-app-count').textContent = allApps.length;
-    
     renderApps();
     renderAdminApps();
   } catch(err) {
@@ -157,18 +160,15 @@ async function fetchApps() {
 function renderApps(filter = 'all', search = '') {
   const grid = document.getElementById('apps-grid');
   grid.innerHTML = '';
-  
   const filtered = allApps.filter(app => {
     const matchCat = filter === 'all' || app.category === filter;
     const matchSearch = app.name.toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
   });
-
   if(filtered.length === 0) {
     grid.innerHTML = `<div class="empty-state">لا توجد تطبيقات مطابقة لعملية البحث</div>`;
     return;
   }
-
   filtered.forEach(app => {
     const div = document.createElement('div');
     div.className = 'app-card reveal visible';
@@ -216,6 +216,7 @@ document.querySelectorAll('.tool-tile').forEach(tile => {
   };
 });
 
+// لوحة تحكم الأدمن
 function renderAdminApps() {
   const list = document.getElementById('admin-app-list');
   list.innerHTML = '';
@@ -233,7 +234,6 @@ function renderAdminApps() {
     `;
     list.appendChild(div);
   });
-
   document.querySelectorAll('.edit-btn').forEach(b => b.onclick = (e) => loadEditForm(e.target.dataset.id));
   document.querySelectorAll('.del-btn').forEach(b => b.onclick = (e) => deleteApp(e.target.dataset.id));
 }
@@ -247,6 +247,7 @@ function loadEditForm(id) {
   document.getElementById('app-category').value = editModeApp.category;
   document.getElementById('app-version').value = editModeApp.version;
   document.getElementById('app-description').value = editModeApp.description;
+  document.getElementById('app-file').value = editModeApp.fileUrl || '';
   document.getElementById('cancel-edit').classList.remove('hidden');
   document.getElementById('save-app').textContent = 'حفظ التعديلات';
   window.scrollTo({ top: document.getElementById('admin-panel').offsetTop, behavior: 'smooth' });
@@ -260,61 +261,44 @@ document.getElementById('cancel-edit').onclick = () => {
   editModeApp = null;
 };
 
-async function uploadFile(file, pathFolder) {
+// تحويل صورة الغلاف إلى كود رقمي وتخزينها مجاناً فوراً
+function fileToBase64(file) {
   return new Promise((resolve, reject) => {
-    const storageRef = ref(storage, `${pathFolder}/${Date.now()}_${file.name}`);
-    const task = uploadBytesResumable(storageRef, file);
-    const progressEl = document.getElementById('upload-progress');
-    const barEl = document.getElementById('progress-bar');
-    progressEl.classList.remove('hidden');
-
-    task.on('state_changed', 
-      (snap) => {
-        const progress = (snap.bytesTransferred / snap.totalBytes) * 100;
-        barEl.style.width = progress + '%';
-      },
-      (err) => { progressEl.classList.add('hidden'); reject(err); },
-      async () => {
-        progressEl.classList.add('hidden');
-        const url = await getDownloadURL(task.snapshot.ref);
-        resolve({ url, path: task.snapshot.ref.fullPath });
-      }
-    );
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+    reader.readAsDataURL(file);
   });
 }
 
 document.getElementById('app-form').onsubmit = async (e) => {
   e.preventDefault();
   if(!isAdmin) return showToast('غير مصرح لك');
-
   const msg = document.getElementById('admin-message');
-  msg.textContent = 'جاري المعالجة...';
+  msg.textContent = 'جاري المعالجة والحفظ...';
   const id = document.getElementById('edit-id').value;
   
+  let coverUrl = editModeApp ? editModeApp.coverUrl : '';
+  const imgFile = document.getElementById('app-image').files[0];
+  
+  if (imgFile) {
+    if (imgFile.size > 800 * 1024) { 
+      msg.textContent = 'يرجى اختيار صورة أصغر من 1 ميجابايت';
+      return;
+    }
+    coverUrl = await fileToBase64(imgFile);
+  }
+
   const appData = {
     name: document.getElementById('app-name').value,
     category: document.getElementById('app-category').value,
     version: document.getElementById('app-version').value,
     description: document.getElementById('app-description').value,
+    coverUrl: coverUrl,
+    fileUrl: document.getElementById('app-file').value,
   };
 
-  const imgFile = document.getElementById('app-image').files[0];
-  const apkFile = document.getElementById('app-file').files[0];
-
   try {
-    if(imgFile) {
-      msg.textContent = 'جاري رفع غلاف التطبيق...';
-      const imgUpload = await uploadFile(imgFile, 'apps/covers');
-      appData.coverUrl = imgUpload.url;
-      appData.coverPath = imgUpload.path;
-    }
-    if(apkFile) {
-      msg.textContent = 'جاري رفع ملف التطبيق/اللعبة...';
-      const fileUpload = await uploadFile(apkFile, 'apps/files');
-      appData.fileUrl = fileUpload.url;
-      appData.filePath = fileUpload.path;
-    }
-
     if(id) {
       appData.updatedAt = serverTimestamp();
       await updateDoc(doc(db, 'apps', id), appData);
@@ -324,11 +308,10 @@ document.getElementById('app-form').onsubmit = async (e) => {
       await addDoc(collection(db, 'apps'), appData);
       showToast('تم نشر التطبيق في المكتبة بنجاح');
     }
-
     document.getElementById('app-form').reset();
     document.getElementById('cancel-edit').click();
     msg.textContent = '';
-    fetchApps(); // تحديث القائمة
+    fetchApps();
   } catch (err) {
     msg.textContent = 'خطأ: ' + err.message;
   }
@@ -336,10 +319,7 @@ document.getElementById('app-form').onsubmit = async (e) => {
 
 async function deleteApp(id) {
   if(!confirm('هل أنت متأكد من أنك تريد حذف هذا التطبيق نهائياً؟')) return;
-  const app = allApps.find(a => a.id === id);
   try {
-    if(app.coverPath) await deleteObject(ref(storage, app.coverPath)).catch(e=>console.log(e));
-    if(app.filePath) await deleteObject(ref(storage, app.filePath)).catch(e=>console.log(e));
     await deleteDoc(doc(db, 'apps', id));
     showToast('تم حذف التطبيق نهائياً');
     fetchApps();
