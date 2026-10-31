@@ -1,109 +1,119 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KEMO DEVELOPER | Premium Software</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f7fb">
+  <meta name="description" content="KEMO DEVELOPER — اكتشف التطبيقات والألعاب والأدوات الرقمية.">
+  <title>KEMO DEVELOPER — Apps & Games</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-    <div class="bg-animation">
-        <div class="glow-layer"></div>
-        <div class="glow-layer cyan"></div>
-    </div>
-
-    <header class="navbar">
-        <a href="#" class="logo">KEMO <span>DEVELOPER</span></a>
-        <nav class="nav-links">
-            <a href="#home">Home</a>
-            <a href="#apps">Apps</a>
-            <a href="#contact">Contact</a>
-        </nav>
-        <div class="nav-actions">
-            <button id="themeToggle">🌓 Theme</button>
-            <button id="authBtn">Login</button>
-            <button id="logoutBtn" style="display: none;">Logout</button>
-        </div>
+  <div class="site-shell">
+    <header class="header" id="top">
+      <a class="logo" href="#top" aria-label="KEMO DEVELOPER">
+        <span class="logo-symbol">K</span><span>KEMO<span class="logo-accent">.</span>DEVELOPER</span>
+      </a>
+      <button class="menu-toggle" id="menu-toggle" aria-label="فتح القائمة" aria-expanded="false"><span></span><span></span><span></span></button>
+      <nav class="nav" id="nav">
+        <a href="#home">الرئيسية</a><a href="#apps">التطبيقات</a><a href="#updates">الجديد</a><a href="#toolkit">التصنيفات</a><a href="#contact">تواصل</a>
+      </nav>
+      <div class="header-actions">
+        <button id="theme-toggle" class="icon-btn" aria-label="تغيير المظهر" title="تغيير المظهر">☾</button>
+        <span id="user-email" class="user-email"></span>
+        <button id="login-btn" class="btn btn-outline small">دخول</button>
+        <button id="signup-btn" class="btn btn-dark small">إنشاء حساب</button>
+        <button id="logout-btn" class="btn btn-outline small hidden">خروج</button>
+      </div>
     </header>
 
-    <section id="home" class="hero hidden-scroll">
-        <div class="hero-content">
-            <h1>Next-Gen <br><span>Software Platform</span></h1>
-            <p>Discover premium tools, applications, and assets built for modern creators and developers. Experience the future of digital marketplaces.</p>
-            <div style="display: flex; gap: 1rem;">
-                <button class="btn-primary nav-actions button" style="padding: 0.8rem 2rem; border-radius:12px" onclick="document.getElementById('apps').scrollIntoView()">Explore Apps</button>
-            </div>
+    <main>
+      <section class="hero section-wrap" id="home">
+        <div class="hero-content reveal">
+          <div class="availability"><span class="status-dot"></span> منصة التطبيقات والألعاب</div>
+          <h1>كل ما تحتاجه<br>من <span class="gradient-text">تطبيقات وألعاب</span><br>في مكان واحد.</h1>
+          <p class="hero-lead">اكتشف أحدث الإصدارات، تصفّح مكتبتنا الرقمية، وحمّل تطبيقاتك المفضلة بسهولة من KEMO DEVELOPER.</p>
+          <div class="hero-buttons"><a class="btn btn-dark" href="#apps">استكشف المكتبة <span>←</span></a><a class="btn btn-text" href="#about">اعرف المزيد <span>↙</span></a></div>
+          <div class="hero-meta"><div><strong id="app-count">—</strong><span>تطبيق متاح</span></div><i></i><div><strong>24/7</strong><span>تصفح في أي وقت</span></div><i></i><div><strong>Free</strong><span>سهولة الوصول</span></div></div>
         </div>
-        <div class="hero-visual">
-            <div class="hero-card"></div>
+        <div class="hero-visual reveal" aria-label="تصميم توضيحي">
+          <div class="visual-grid"></div><div class="visual-glow"></div>
+          <div class="floating-card card-top"><span class="mini-icon purple">✦</span><div><b>تحديثات مستمرة</b><small>محتوى جديد باستمرار</small></div></div>
+          <div class="app-window">
+            <div class="window-bar"><span></span><span></span><span></span><small>KEMO LIBRARY</small></div>
+            <div class="window-content"><div class="window-logo">K<span>.</span></div><b>Discover something<br>new today.</b><p>Apps · Games · Tools</p><div class="window-pills"><i></i><i></i><i></i></div></div>
+          </div>
+          <div class="floating-card card-bottom"><span class="mini-icon blue">↗</span><div><b>تجربة بسيطة</b><small>تصميم سريع ومتجاوب</small></div></div>
+          <div class="decor decor-one"></div><div class="decor decor-two"></div>
         </div>
-    </section>
+      </section>
 
-    <!-- Admin Section (Hidden by Default) -->
-    <section id="adminPanel" class="admin-section hidden-scroll">
-        <h2>Admin Dashboard</h2>
-        <p style="color: var(--text-sec); margin-bottom: 1rem;">Add or update applications directly to Firestore.</p>
-        <form id="addAppForm" class="admin-form">
-            <input type="hidden" id="appId">
-            <input type="text" id="appName" placeholder="Application Name" required>
-            <select id="appCategory" required>
-                <option value="">Select Category</option>
-                <option value="Tools">Tools</option>
-                <option value="Games">Games</option>
-                <option value="Productivity">Productivity</option>
-                <option value="Development">Development</option>
-            </select>
-            <input type="text" id="appVersion" placeholder="Version (e.g. 1.0.0)" required>
-            <input type="url" id="appImage" placeholder="Cover Image URL" required>
-            <input type="url" id="appDownload" placeholder="Download URL" required>
-            <textarea id="appDesc" placeholder="Full Description..." required></textarea>
-            <button type="submit" class="btn-primary nav-actions button" style="border:none;">Save Application</button>
-        </form>
-    </section>
+      <section class="trust-strip section-wrap reveal" id="about">
+        <p>كل ما يهمك في تجربة رقمية واحدة</p>
+        <div class="trust-items"><span>APPS</span><span>GAMES</span><span>TOOLS</span><span>UPDATES</span><span>COMMUNITY</span></div>
+      </section>
 
-    <section id="apps" class="catalog hidden-scroll">
-        <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Apps Catalog</h2>
-        <div class="catalog-controls">
-            <input type="text" id="searchInput" placeholder="Search applications...">
-            <select id="filterCategory">
-                <option value="All">All Categories</option>
-                <option value="Tools">Tools</option>
-                <option value="Games">Games</option>
-                <option value="Productivity">Productivity</option>
-                <option value="Development">Development</option>
-            </select>
-        </div>
-        <div id="appsGrid" class="grid">
-            <div class="empty-state">Loading applications...</div>
-        </div>
-    </section>
+      <section class="section-wrap section-block" id="apps">
+        <div class="section-heading reveal"><div><span class="eyebrow">المكتبة الرقمية</span><h2>استكشف <span class="gradient-text">التطبيقات</span></h2><p>تصفّح أحدث التطبيقات والألعاب المتاحة على المنصة.</p></div><a class="view-all" href="#apps-grid">عرض المكتبة <span>←</span></a></div>
+        <div class="catalog-tools reveal"><div class="search-wrap"><span>⌕</span><input id="search-input" type="search" placeholder="ابحث عن تطبيق أو لعبة..."></div><div id="category-filters" class="filters"><button class="filter active" data-category="all">الكل</button><button class="filter" data-category="ألعاب">ألعاب</button><button class="filter" data-category="تطبيقات">تطبيقات</button><button class="filter" data-category="أدوات">أدوات</button></div></div>
+        <div id="apps-grid" class="apps-grid"><div class="loading-state">جاري تجهيز المكتبة...</div></div>
+        <div class="catalog-note" id="catalog-note">تظهر التطبيقات المنشورة هنا تلقائيًا.</div>
+      </section>
 
-    <section id="contact" class="hidden-scroll">
-        <h2>Contact Us</h2>
-        <form class="admin-form" style="max-width: 600px; margin-top: 2rem;" onsubmit="event.preventDefault(); showToast('Message Sent Successfully!');">
-            <input type="text" placeholder="Your Name" required>
-            <input type="email" placeholder="Your Email" required>
-            <textarea placeholder="Your Message..." required></textarea>
-            <button type="submit" class="btn-primary nav-actions button">Send Message</button>
-        </form>
-    </section>
+      <section class="feature-band section-wrap reveal" id="updates">
+        <div class="feature-copy"><span class="eyebrow">ابقَ على اطلاع</span><h2>الجديد دائمًا<br><span class="gradient-text">في مكان واحد.</span></h2><p>تابع الإصدارات الجديدة والتحديثات المضافة إلى مكتبة KEMO DEVELOPER.</p><a class="btn btn-dark" href="#apps">شاهد أحدث الإضافات <span>←</span></a></div>
+        <div class="feature-stack"><div class="stack-card stack-one"><span class="stack-number">01</span><div><b>إصدارات جديدة</b><small>تطبيقات وألعاب مضافة حديثًا</small></div><span class="stack-arrow">↗</span></div><div class="stack-card stack-two"><span class="stack-number">02</span><div><b>تحديثات محسّنة</b><small>تابع آخر نسخ التطبيقات</small></div><span class="stack-arrow">↗</span></div><div class="stack-card stack-three"><span class="stack-number">03</span><div><b>تحميل مباشر</b><small>الوصول إلى روابط التحميل</small></div><span class="stack-arrow">↗</span></div></div>
+      </section>
 
-    <!-- Auth Modal -->
-    <div id="authModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" id="closeAuth">&times;</button>
-            <h2 id="modalTitle" style="margin-bottom: 1.5rem;">Login</h2>
-            <form id="authForm">
-                <input type="email" id="authEmail" placeholder="Email" required>
-                <input type="password" id="authPassword" placeholder="Password" required>
-                <button type="submit" class="btn-primary nav-actions button" id="authSubmitBtn">Login</button>
-            </form>
-            <p style="margin-top: 1rem; text-align: center; color: var(--text-sec); cursor: pointer;" id="toggleAuthMode">Don't have an account? Sign Up</p>
+      <section class="section-wrap section-block toolkit" id="toolkit">
+        <div class="section-heading reveal"><div><span class="eyebrow">التصنيفات</span><h2>مكتبة <span class="gradient-text">متنوعة</span></h2><p>اختار القسم المناسب وابدأ التصفح.</p></div></div>
+        <div class="toolkit-grid reveal">
+          <button class="tool-tile" data-pick="ألعاب"><span class="tool-symbol purple-bg">♜</span><b>الألعاب</b><small>ألعاب متنوعة</small><span class="tile-arrow">↗</span></button>
+          <button class="tool-tile" data-pick="تطبيقات"><span class="tool-symbol blue-bg">▣</span><b>التطبيقات</b><small>تطبيقات مفيدة</small><span class="tile-arrow">↗</span></button>
+          <button class="tool-tile" data-pick="أدوات"><span class="tool-symbol orange-bg">⌘</span><b>الأدوات</b><small>أدوات رقمية</small><span class="tile-arrow">↗</span></button>
+          <button class="tool-tile" data-pick="all"><span class="tool-symbol green-bg">✧</span><b>كل المحتوى</b><small>تصفح المكتبة كاملة</small><span class="tile-arrow">↗</span></button>
         </div>
+      </section>
+
+      <section class="quote-section section-wrap reveal">
+        <div class="quote-mark">“</div><div><span class="eyebrow">KEMO DEVELOPER</span><h2>اكتشف. جرّب. <span class="gradient-text">استمتع.</span></h2><p>منصة بسيطة للوصول إلى التطبيقات والألعاب التي تبحث عنها.</p></div><div class="quote-stamp">K<span>.</span></div>
+      </section>
+
+      <section class="contact-section section-wrap section-block" id="contact">
+        <div class="contact-copy reveal"><span class="eyebrow">تواصل معنا</span><h2>هل لديك <span class="gradient-text">استفسار؟</span></h2><p>يسعدنا استقبال رسائلك وملاحظاتك حول الموقع والتطبيقات المنشورة.</p><div class="contact-detail"><span class="contact-icon">✉</span><div><small>البريد الإلكتروني</small><b>kareemammar2025@gmail.com</b></div></div></div>
+        <form class="contact-form reveal" id="contact-form"><label>الاسم<input id="contact-name" required placeholder="اكتب اسمك"></label><label>البريد الإلكتروني<input id="contact-email" type="email" required placeholder="name@example.com"></label><label>رسالتك<textarea id="contact-message" required rows="4" placeholder="كيف نقدر نساعدك؟"></textarea></label><button class="btn btn-dark" type="submit">إرسال الرسالة <span>←</span></button><p id="contact-status" class="form-status"></p></form>
+      </section>
+    </main>
+
+    <footer class="footer section-wrap"><a class="logo" href="#top"><span class="logo-symbol">K</span><span>KEMO<span class="logo-accent">.</span>DEVELOPER</span></a><p>© <span id="year"></span> KEMO DEVELOPER. جميع الحقوق محفوظة.</p><a href="#top" class="back-top">العودة للأعلى ↑</a></footer>
+  </div>
+
+  <div id="auth-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card auth-card"><button class="modal-close" id="auth-close" aria-label="إغلاق">×</button><span class="eyebrow">مرحبًا بك</span><h2 id="auth-title">تسجيل الدخول</h2><p id="auth-subtitle" class="modal-subtitle">سجّل الدخول للوصول إلى حسابك.</p>
+      <form id="auth-form"><label id="name-field" class="hidden">الاسم<input id="display-name" autocomplete="name" placeholder="اسمك"></label><label>البريد الإلكتروني<input id="auth-email" type="email" autocomplete="email" required placeholder="name@example.com"></label><label>كلمة المرور<input id="auth-password" type="password" minlength="6" autocomplete="current-password" required placeholder="6 أحرف على الأقل"></label><button class="btn btn-dark full-width" id="auth-submit">دخول</button></form>
+      <button class="text-action" id="forgot-password">نسيت كلمة المرور؟</button><div class="auth-switch"><span id="switch-label">ليس لديك حساب؟</span><button id="auth-switch">إنشاء حساب</button></div><p id="auth-message" class="form-status"></p>
     </div>
+  </div>
 
-    <div id="toast">Message</div>
-
-    <script type="module" src="app.js"></script>
+  <section id="admin-panel" class="admin-panel hidden">
+    <div class="admin-top"><div><span class="eyebrow">ADMIN WORKSPACE</span><h2>لوحة إدارة المحتوى</h2><p>أضف تطبيقاتك وارفع صور الغلاف وملفات التحميل.</p></div><span class="admin-badge">صلاحية أدمن</span></div>
+    <form id="app-form" class="admin-form">
+      <input id="edit-id" type="hidden">
+      <label>اسم التطبيق<input id="app-name" required maxlength="80" placeholder="مثال: Kemo Tools"></label>
+      <label>التصنيف<select id="app-category"><option>تطبيقات</option><option>ألعاب</option><option>أدوات</option></select></label>
+      <label>رقم الإصدار<input id="app-version" maxlength="30" placeholder="1.0.0"></label>
+      <label>صورة الغلاف <input id="app-image" type="file" accept="image/png,image/jpeg,image/webp"></label>
+      <label>ملف التطبيق / اللعبة <input id="app-file" type="file" accept=".apk,.aab,.zip,.xapk,.apks,application/vnd.android.package-archive,application/zip"></label>
+      <label class="wide">وصف التطبيق<textarea id="app-description" required maxlength="500" rows="3" placeholder="اكتب وصفًا واضحًا للتطبيق..."></textarea></label>
+      <div class="upload-progress wide hidden" id="upload-progress"><div id="progress-bar"></div></div>
+      <div class="admin-form-actions wide"><button class="btn btn-dark" id="save-app" type="submit">نشر التطبيق</button><button class="btn btn-outline hidden" id="cancel-edit" type="button">إلغاء التعديل</button><span id="admin-message" class="form-status"></span></div>
+    </form>
+    <div class="admin-list-head"><h3>التطبيقات المنشورة</h3><span id="admin-app-count">0</span></div><div id="admin-app-list" class="admin-app-list"></div>
+  </section>
+  <div id="toast" class="toast" role="status"></div>
+  <script type="module" src="./app.js"></script>
 </body>
 </html>
