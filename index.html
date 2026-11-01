@@ -8,18 +8,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./styles.css">
+  <!-- الربط الصحيح لملف التصميم -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="site-shell">
     
-    <!-- الهيدر المحدث والمناسب للموبايل -->
     <header class="header" id="top">
       <a class="logo" href="#" onclick="location.reload()">
         <span class="logo-symbol">K</span><span>KEMO<span class="logo-accent">.</span>DEVELOPER</span>
       </a>
       
-      <!-- أزرار الهيدر الأساسية (بتختفي في الموبايل وتروح للقائمة) -->
       <div class="header-actions desktop-actions">
         <button id="theme-toggle" class="icon-btn" title="تغيير المظهر">☾</button>
         <span id="user-email" class="user-email"></span>
@@ -28,7 +27,6 @@
         <button id="logout-btn" class="btn btn-outline small hidden">خروج</button>
       </div>
 
-      <!-- زر الثلاث شرط (للموبايل فقط) -->
       <div class="mobile-header-tools">
         <button id="theme-toggle-mobile" class="icon-btn" title="تغيير المظهر">☾</button>
         <button class="menu-toggle" id="menu-toggle" aria-label="فتح القائمة">
@@ -36,14 +34,12 @@
         </button>
       </div>
 
-      <!-- قائمة الروابط والأزرار المنسدلة -->
       <nav class="nav" id="nav">
         <a href="#about-me">عن المطور</a>
         <a href="#apps">التطبيقات</a>
         <a href="#updates">الجديد</a>
         <a href="#contact">تواصل</a>
         
-        <!-- أزرار الدخول داخل القائمة للموبايل فقط -->
         <div class="mobile-auth-actions hidden-desktop">
           <span id="mobile-user-email" class="user-email-mobile"></span>
           <button id="mobile-login-btn" class="btn btn-outline full-width">تسجيل دخول</button>
@@ -58,7 +54,7 @@
         <div class="hero-content reveal">
           <div class="availability"><span class="status-dot"></span> منصة البرمجيات والتطبيقات</div>
           <h1>كل ما تحتاجه<br>من <span class="gradient-text">تطبيقات وألعاب</span><br>في مكان واحد.</h1>
-          <p class="hero-lead">اكتشف أحدث الإصدارات، تصفّح مكتبتنا الرقمية، وحمّل تطبيقاتك المفضلة بسهولة من KEMO DEVELOPER.</p>
+          <p class="hero-lead">اكتشف أحدث الإصدارات، تصفّح مكتبتنا الرقمية، وحمّل تطبيقاتك المفضلة بسهولة.</p>
           <div class="hero-buttons">
             <a class="btn btn-dark" href="#apps">استكشف المكتبة <span>←</span></a>
             <a class="btn btn-text" href="#about-me">عن المطور <span>↙</span></a>
@@ -74,10 +70,9 @@
           <div class="floating-card card-top"><span class="mini-icon purple">✦</span><div><b>تحديثات مستمرة</b><small>محتوى جديد باستمرار</small></div></div>
           <div class="app-window">
             <div class="window-bar"><span></span><span></span><span></span><small>KEMO LIBRARY</small></div>
-            <div class="window-content"><div class="window-logo">K<span>.</span></div><b>Discover something<br>new today.</b><p>Apps · Games · Tools</p><div class="window-pills"><i></i><i></i><i></i></div></div>
+            <div class="window-content"><div class="window-logo">K<span>.</span></div><b>Discover something<br>new today.</b><p>Apps · Games · Tools</p></div>
           </div>
           <div class="floating-card card-bottom"><span class="mini-icon blue">↗</span><div><b>تجربة بسيطة</b><small>تصميم سريع ومتجاوب</small></div></div>
-          <div class="decor decor-one"></div><div class="decor decor-two"></div>
         </div>
       </section>
 
@@ -86,7 +81,7 @@
           <div class="dev-card-ambient"></div>
           <div class="dev-card-inner">
             <div class="dev-avatar-wrapper">
-              <div class="dev-avatar-ring"><img id="profile-img" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300" alt="صورة المطور"></div>
+              <div class="dev-avatar-ring"><img id="profile-img" src="https://via.placeholder.com/150" alt="صورة المطور"></div>
               <div class="dev-status-tag"><span class="status-beacon"></span> متاح للمشاريع</div>
             </div>
             <div class="dev-content-wrapper">
@@ -168,7 +163,7 @@
       </div>
     </section>
 
-    <!-- نافذة إضافة إصدار جديد -->
+    <!-- النوافذ المنبثقة -->
     <div id="version-modal" class="modal hidden">
       <div class="modal-card version-modal-card">
         <button class="modal-close" id="version-modal-close">×</button>
@@ -247,6 +242,7 @@
     
     <div id="toast" class="toast"></div>
   </div>
-  <script type="module" src="./app.js"></script>
+  <!-- الربط الصحيح لملف الجافاسكريبت بدون نقطة -->
+  <script type="module" src="app.js"></script>
 </body>
 </html>
