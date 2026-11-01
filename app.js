@@ -14,6 +14,7 @@ function showToast(msg) {
   setTimeout(() => toastEl.classList.remove('show'), 3500);
 }
 
+// المظهر وقائمة الموبايل
 document.getElementById('theme-toggle').onclick = () => {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
@@ -24,10 +25,7 @@ if (localStorage.getItem('kemo-theme') === 'dark') document.documentElement.setA
 document.getElementById('menu-toggle').onclick = () => document.getElementById('nav').classList.toggle('open');
 document.getElementById('year').textContent = new Date().getFullYear();
 
-const observer = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.1 });
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-// العداد
+// 1. عداد الزوار الحقيقي
 async function trackVisitor() {
   const vRef = doc(db, 'stats', 'visitors');
   try {
@@ -41,7 +39,7 @@ async function trackVisitor() {
 }
 trackVisitor();
 
-// المطور
+// 2. بيانات المطور (مع إضافة الانستجرام)
 async function loadProfile() {
   try {
     const snap = await getDoc(doc(db, 'settings', 'profile'));
@@ -51,6 +49,7 @@ async function loadProfile() {
       if(d.tag) document.getElementById('profile-tag').textContent = d.tag;
       if(d.bio) document.getElementById('profile-bio').textContent = d.bio;
       if(d.img) document.getElementById('profile-img').src = d.img;
+      
       if(d.fb) document.getElementById('link-facebook').href = d.fb;
       if(d.wa) document.getElementById('link-whatsapp').href = d.wa;
       if(d.ig) document.getElementById('link-instagram').href = d.ig;
@@ -95,7 +94,7 @@ document.getElementById('show-profile-form-btn').onclick = () => {
   document.getElementById('profile-form').classList.remove('hidden');
 };
 
-// التطبيقات
+// 3. التطبيقات وتفاصيلها (صفحة كاملة واللايك السريع)
 let allApps = [];
 let currentApp = null;
 let isAdmin = false;
@@ -118,7 +117,7 @@ function renderApps(filter = 'all', search = '') {
 
   filtered.forEach(app => {
     const card = document.createElement('div');
-    card.className = 'app-card reveal visible';
+    card.className = 'app-card reveal';
     card.onclick = () => openAppView(app);
     card.innerHTML = `
       <div class="app-cover">
@@ -141,9 +140,9 @@ function renderApps(filter = 'all', search = '') {
   });
 }
 
-// زر الإعجاب السريع من الخارج
+// اللايك السريع من الخارج
 window.handleQuickLike = async (e, appId) => {
-  e.stopPropagation();
+  e.stopPropagation(); // يمنع فتح الصفحة
   const key = `liked_${appId}`;
   if (localStorage.getItem(key)) return showToast('لقد قمت بالإعجاب مسبقاً!');
   await updateDoc(doc(db, 'apps', appId), { likes: increment(1) });
@@ -155,7 +154,7 @@ window.handleQuickLike = async (e, appId) => {
   if(appIndex > -1) allApps[appIndex].likes = (allApps[appIndex].likes || 0) + 1;
 };
 
-// فتح الصفحة الكاملة
+// فتح صفحة التطبيق الكاملة
 function openAppView(app) {
   currentApp = app;
   document.getElementById('home-view').classList.add('hidden');
@@ -166,7 +165,6 @@ function openAppView(app) {
   document.getElementById('detail-app-category').textContent = app.category;
   document.getElementById('detail-likes-count').textContent = app.likes || 0;
 
-  // إعداد الواجهة للإصدار الأخير عند فتح الصفحة
   setActiveVersionUI({
     version: app.version,
     name: app.name,
@@ -174,7 +172,7 @@ function openAppView(app) {
     description: app.description,
     fileUrl: app.fileUrl,
     releaseNotes: app.releaseNotes
-  }, true); // true means it's the latest
+  }, true); 
 
   buildVersions(app);
 
@@ -189,26 +187,25 @@ document.getElementById('app-details-back').onclick = () => {
   document.getElementById('home-view').classList.remove('hidden');
 };
 
-// دالة لتغيير كل محتويات الصفحة بناء على الإصدار المختار
+// تغيير بيانات الصفحة (الصورة، الاسم، الوصف) بناء على الإصدار
 function setActiveVersionUI(verData, isLatest = false) {
   document.getElementById('detail-app-latest-ver').textContent = `الإصدار المعروض: v${verData.version} ${isLatest ? '(الأحدث)' : ''}`;
   document.getElementById('detail-app-name').textContent = verData.name;
   document.getElementById('detail-app-cover').src = verData.coverUrl || 'https://via.placeholder.com/150';
   document.getElementById('detail-download-btn').href = verData.fileUrl;
-  document.getElementById('detail-download-btn').innerHTML = `تثبيت (v${verData.version}) ⤓`;
   
   let descText = isLatest ? verData.description : (verData.releaseNotes || 'نسخة سابقة من التطبيق.');
   document.getElementById('detail-app-desc').textContent = descText;
 }
 
-// بناء سجل الإصدارات
+// بناء قائمة الإصدارات التفاعلية
 function buildVersions(app) {
   const vList = document.getElementById('detail-versions-list');
   vList.innerHTML = '';
   
   const mainVer = document.createElement('div');
   mainVer.className = 'version-card-selectable active-version';
-  mainVer.innerHTML = `<div><b>v${app.version} (الأخير)</b><br><small style="color:var(--muted)">${app.releaseNotes || 'النسخة الأصلية'}</small></div><span>محدد ✓</span>`;
+  mainVer.innerHTML = `<div><b>v${app.version} (الأخير)</b><br><small style="color:var(--muted)">${app.releaseNotes || 'النسخة الحالية'}</small></div><span>محدد ✓</span>`;
   mainVer.onclick = () => { 
     highlightVer(mainVer); 
     setActiveVersionUI(app, true);
@@ -219,10 +216,10 @@ function buildVersions(app) {
     app.history.forEach(h => {
       const oldVer = document.createElement('div');
       oldVer.className = 'version-card-selectable dimmed';
-      oldVer.innerHTML = `<div><b>v${h.version}</b> <small style="color:var(--muted)">(سابق)</small><br><small style="color:var(--muted)">${h.releaseNotes || 'نسخة قديمة'}</small></div><span>تصفح ↗</span>`;
+      oldVer.innerHTML = `<div><b>v${h.version}</b> <small style="color:var(--muted)">(سابق)</small><br><small style="color:var(--muted)">${h.releaseNotes || 'تحديثات سابقة'}</small></div><span>تصفح ↗</span>`;
       oldVer.onclick = () => { 
         highlightVer(oldVer); 
-        setActiveVersionUI(h, false); // h contains old name, cover, url, notes
+        setActiveVersionUI(h, false);
       };
       vList.appendChild(oldVer);
     });
@@ -246,6 +243,7 @@ document.getElementById('detail-like-btn').onclick = async () => {
   fetchApps(); 
 };
 
+// الآراء والتعليقات
 async function loadReviews(appId) {
   const rList = document.getElementById('reviews-list');
   rList.innerHTML = '<small>جاري جلب الآراء...</small>';
@@ -271,11 +269,11 @@ document.getElementById('add-review-form').onsubmit = async (e) => {
   loadReviews(currentApp.id);
 };
 
-// 4. إضافة إصدار جديد بإمكانيات كاملة
+// 4. إضافة إصدار جديد بإمكانيات كاملة (اسم وصورة ووصف جديد)
 document.getElementById('admin-add-ver-btn').onclick = () => {
   document.getElementById('ver-app-id').value = currentApp.id;
   document.getElementById('version-app-title').textContent = currentApp.name;
-  document.getElementById('new-ver-name').value = currentApp.name; // الاسم الافتراضي
+  document.getElementById('new-ver-name').value = currentApp.name; 
   document.getElementById('version-modal').classList.remove('hidden');
 };
 document.getElementById('version-modal-close').onclick = () => document.getElementById('version-modal').classList.add('hidden');
@@ -294,7 +292,7 @@ document.getElementById('version-form').onsubmit = async (e) => {
     const d = snap.data();
     const history = d.history || [];
     
-    // نقل الداتا الحالية للسجل قبل التحديث
+    // حفظ القديم في السجل
     history.unshift({ 
       version: d.version, 
       name: d.name,
@@ -325,6 +323,7 @@ document.getElementById('version-form').onsubmit = async (e) => {
   }
 };
 
+// الحذف والتعديل الأساسي
 document.getElementById('admin-delete-app-btn').onclick = async () => {
   if (confirm(`حذف "${currentApp.name}" نهائياً؟`)) {
     await deleteDoc(doc(db, 'apps', currentApp.id));
@@ -392,6 +391,7 @@ function fileToBase64(file) {
   });
 }
 
+// البحث والتصنيفات
 document.getElementById('search-input').oninput = e => renderApps(document.querySelector('.filter.active').dataset.category, e.target.value);
 document.querySelectorAll('.filter').forEach(btn => {
   btn.onclick = () => {
@@ -411,7 +411,7 @@ document.querySelectorAll('.tool-tile').forEach(tile => {
   };
 });
 
-// ===================== 5. المصادقة وتصميم المودال الجديد =====================
+// ===================== 5. المصادقة الجديدة =====================
 let isLoginMode = true;
 
 function openAuthForm(mode) {
@@ -449,21 +449,21 @@ document.getElementById('auth-form').onsubmit = async (e) => {
     document.getElementById('auth-modal').classList.add('hidden');
     document.getElementById('auth-form').reset();
   } catch(err) {
-    showToast('تأكد من صحة البيانات!');
+    showToast('خطأ: تأكد من صحة البيانات!');
   }
 };
 
-// حل مشكلة نسيت كلمة المرور بالرابط الآمن
+// نسيت كلمة المرور
 document.getElementById('forgot-password').onclick = async (e) => {
   e.preventDefault();
   const email = document.getElementById('auth-email').value;
-  if(!email) return showToast('يرجى كتابة البريد الإلكتروني في الخانة أولاً، ثم الضغط هنا');
+  if(!email) return showToast('اكتب البريد الإلكتروني في الخانة أولاً، ثم اضغط هنا');
   try {
     await sendPasswordResetEmail(auth, email);
     document.getElementById('auth-modal').classList.add('hidden');
-    showToast('تم إرسال رابط آمن لاستعادة كلمة المرور لبريدك. راجع الرسائل الواردة!');
+    showToast('تم إرسال رابط آمن لاستعادة كلمة المرور لبريدك.');
   } catch(err) {
-    showToast('حدث خطأ: تأكد أن البريد مكتوب بشكل صحيح ومسجل لدينا');
+    showToast('حدث خطأ: تأكد أن البريد مسجل لدينا');
   }
 };
 
