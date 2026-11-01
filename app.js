@@ -1,6 +1,6 @@
 import { firebaseConfig } from './firebase-config.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc, collection, addDoc, updateDoc, deleteDoc, getDocs, query, orderBy, serverTimestamp, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 const app = initializeApp(firebaseConfig);
@@ -14,7 +14,7 @@ function showToast(msg) {
   setTimeout(() => toastEl.classList.remove('show'), 3000);
 }
 
-// المظهر وقائمة الموبايل
+// المظهر الليلي والفاتح
 document.getElementById('theme-toggle').onclick = () => {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
@@ -24,22 +24,32 @@ if (localStorage.getItem('kemo-theme') === 'dark') document.documentElement.setA
 document.getElementById('menu-toggle').onclick = () => document.getElementById('nav').classList.toggle('open');
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// أنميشن الظهور
+// Intersection Observer
 const observer = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.1 });
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-// 1. عداد الزيارات الحقيقي
+// 1. عداد الزيارات الحقيقي 100% (بدون أي أرقام وهمية)
 async function trackVisitor() {
+  const vRef = doc(db, 'stats', 'visitors');
   try {
-    const vRef = doc(db, 'stats', 'visitors');
-    await setDoc(vRef, { count: increment(1) }, { merge: true });
+    // زيادة العداد لمرة واحدة لكل جلسة متصفح
+    if (!sessionStorage.getItem('visited_session')) {
+      await setDoc(vRef, { count: increment(1) }, { merge: true });
+      sessionStorage.setItem('visited_session', 'true');
+    }
     const snap = await getDoc(vRef);
-    if (snap.exists()) document.getElementById('live-visitors-count').textContent = snap.data().count.toLocaleString('ar-EG');
-  } catch(e) { document.getElementById('live-visitors-count').textContent = '2,400+'; }
+    if (snap.exists()) {
+      document.getElementById('live-visitors-count').textContent = snap.data().count.toLocaleString('ar-EG');
+    } else {
+      document.getElementById('live-visitors-count').textContent = '1';
+    }
+  } catch(e) {
+    document.getElementById('live-visitors-count').textContent = '1';
+  }
 }
 trackVisitor();
 
-// 2. تحميل وحفظ بيانات من أنا
+// 2. تحميل وحفظ بيانات ملف المطور التعريفي
 async function loadProfile() {
   try {
     const snap = await getDoc(doc(db, 'settings', 'profile'));
@@ -60,14 +70,16 @@ async function loadProfile() {
       document.getElementById('edit-profile-wa').value = d.wa || '';
       document.getElementById('edit-profile-gh').value = d.gh || '';
     }
-  } catch(e) {}
+  } catch(e) { console.log(e); }
 }
 loadProfile();
 
+// زر حفظ تعديل معلومات الأدمن (تم إصلاحه ليعمل فوراً)
 document.getElementById('profile-form').onsubmit = async (e) => {
   e.preventDefault();
   const st = document.getElementById('profile-save-status');
   st.textContent = 'جاري الحفظ...';
+
   const data = {
     name: document.getElementById('edit-profile-name').value,
     tag: document.getElementById('edit-profile-tag').value,
@@ -76,16 +88,23 @@ document.getElementById('profile-form').onsubmit = async (e) => {
     wa: document.getElementById('edit-profile-wa').value,
     gh: document.getElementById('edit-profile-gh').value,
   };
-  const imgF = document.getElementById('edit-profile-img').files[0];
-  if (imgF) data.img = await fileToBase64(imgF);
 
-  await setDoc(doc(db, 'settings', 'profile'), data, { merge: true });
-  st.textContent = 'تم حفظ بياناتك بنجاح!';
-  loadProfile();
-  setTimeout(() => st.textContent = '', 3000);
+  const imgF = document.getElementById('edit-profile-img').files[0];
+  if (imgF) {
+    data.img = await fileToBase64(imgF);
+  }
+
+  try {
+    await setDoc(doc(db, 'settings', 'profile'), data, { merge: true });
+    st.textContent = 'تم حفظ بياناتك بنجاح!';
+    showToast('تم تحديث ملفك التعريفي!');
+    loadProfile();
+    setTimeout(() => st.textContent = '', 3000);
+  } catch(err) {
+    st.textContent = 'خطأ: ' + err.message;
+  }
 };
 
-// التبديل بين فورم التطبيق وفورم من أنا في لوحة الأدمن
 document.getElementById('show-app-form-btn').onclick = () => {
   document.getElementById('app-form').classList.remove('hidden');
   document.getElementById('profile-form').classList.add('hidden');
@@ -95,7 +114,7 @@ document.getElementById('show-profile-form-btn').onclick = () => {
   document.getElementById('profile-form').classList.remove('hidden');
 };
 
-// 3. جلب التطبيقات وعرضها
+// 3. التطبيقات وسجل الإصدارات التفاعلي
 let allApps = [];
 let currentApp = null;
 let isAdmin = false;
@@ -128,7 +147,7 @@ function renderApps(filter = 'all', search = '') {
   filtered.forEach(app => {
     const card = document.createElement('div');
     card.className = 'app-card reveal visible';
-    card.onclick = () => openAppModal(app);
+    card.onclick = () => openAppFullPage(app);
     card.innerHTML = `
       <div class="app-cover">
         ${app.coverUrl ? `<img src="${app.coverUrl}" alt="${app.name}">` : `<div class="cover-placeholder">✦</div>`}
@@ -141,7 +160,7 @@ function renderApps(filter = 'all', search = '') {
         </div>
         <p class="app-description">${app.description}</p>
         <div class="app-card-actions">
-          <span>عرض التفاصيل والتثبيت ←</span>
+          <span>فتح صفحة التطبيق ←</span>
           <span style="color:#ff4d6d">♥ ${app.likes || 0}</span>
         </div>
       </div>
@@ -150,50 +169,85 @@ function renderApps(filter = 'all', search = '') {
   });
 }
 
-// فتح نافذة تفاصيل التطبيق
-function openAppModal(app) {
+// فتح صفحة التطبيق الكاملة (Full Page)
+function openAppFullPage(app) {
   currentApp = app;
   document.getElementById('modal-app-name').textContent = app.name;
   document.getElementById('modal-app-category').textContent = app.category;
   document.getElementById('modal-app-desc').textContent = app.description;
   document.getElementById('modal-app-cover').src = app.coverUrl || '';
-  document.getElementById('modal-app-latest-ver').textContent = `الإصدار الأخير: v${app.version}`;
-  document.getElementById('modal-download-btn').href = app.fileUrl || '#';
   document.getElementById('modal-likes-count').textContent = app.likes || 0;
 
-  // سجل الإصدارات
-  const vList = document.getElementById('modal-versions-list');
-  vList.innerHTML = `
-    <div class="version-row" style="border-color: var(--accent);">
-      <div><b>v${app.version} (الأحدث)</b></div>
-      <a href="${app.fileUrl}" target="_blank" class="btn btn-dark small">تحميل ⤓</a>
-    </div>
-  `;
-  if (app.history) {
-    app.history.forEach(h => {
-      vList.innerHTML += `
-        <div class="version-row">
-          <div><b>v${h.version}</b> <small style="color:var(--muted);">(إصدار قديم)</small></div>
-          <a href="${h.fileUrl}" target="_blank" class="btn btn-outline small">تحميل ⤓</a>
-        </div>
-      `;
-    });
-  }
+  // تحديد الإصدار النشط افتراضياً
+  setActiveVersion(app.version, app.fileUrl);
+
+  // بناء سجل الإصدارات التفاعلي
+  buildInteractiveVersions(app);
 
   if (isAdmin) document.getElementById('modal-admin-actions').classList.remove('hidden');
   else document.getElementById('modal-admin-actions').classList.add('hidden');
 
   loadReviews(app.id);
   document.getElementById('app-modal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden'; // قفل التمرير في الخلفية
 }
 
-document.getElementById('app-modal-close').onclick = () => document.getElementById('app-modal').classList.add('hidden');
+document.getElementById('app-modal-close').onclick = () => {
+  document.getElementById('app-modal').classList.add('hidden');
+  document.body.style.overflow = 'auto';
+};
+
+// وظيفة تحديد الإصدار وتغيير زر التحميل بالأعلى
+function setActiveVersion(verNumber, downloadUrl) {
+  document.getElementById('modal-app-latest-ver').textContent = `الإصدار المختار: v${verNumber}`;
+  document.getElementById('modal-download-btn').href = downloadUrl;
+  document.getElementById('modal-download-btn').textContent = `تثبيت وتحميل (v${verNumber}) ⤓`;
+}
+
+// بناء قائمة الإصدارات بحيث الضغط على واحد يحدده ويبهت الباقي
+function buildInteractiveVersions(app) {
+  const vList = document.getElementById('modal-versions-list');
+  vList.innerHTML = '';
+
+  // 1. الإصدار الأحدث الأساسي
+  const mainVerCard = document.createElement('div');
+  mainVerCard.className = 'version-card-selectable active-version';
+  mainVerCard.innerHTML = `<div><b>v${app.version} (الإصدار الأخير)</b></div><span>نشط حالياً ✓</span>`;
+  mainVerCard.onclick = () => {
+    highlightVersionCard(mainVerCard);
+    setActiveVersion(app.version, app.fileUrl);
+  };
+  vList.appendChild(mainVerCard);
+
+  // 2. الإصدارات السابقة (تظهر باهتة حتى يتم الضغط عليها)
+  if (app.history && app.history.length > 0) {
+    app.history.forEach(h => {
+      const verCard = document.createElement('div');
+      verCard.className = 'version-card-selectable dimmed';
+      verCard.innerHTML = `<div><b>v${h.version}</b> <small style="color:var(--muted);">(إصدار سابق)</small></div><span>اختيار ↗</span>`;
+      verCard.onclick = () => {
+        highlightVersionCard(verCard);
+        setActiveVersion(h.version, h.fileUrl);
+      };
+      vList.appendChild(verCard);
+    });
+  }
+}
+
+function highlightVersionCard(selectedCard) {
+  document.querySelectorAll('.version-card-selectable').forEach(card => {
+    card.classList.remove('active-version');
+    card.classList.add('dimmed');
+  });
+  selectedCard.classList.add('active-version');
+  selectedCard.classList.remove('dimmed');
+}
 
 // التفاعل بالقلب
 document.getElementById('modal-like-btn').onclick = async () => {
   if (!currentApp) return;
   const key = `liked_${currentApp.id}`;
-  if (localStorage.getItem(key)) return showToast('لقد تفاعلت بالفعل!');
+  if (localStorage.getItem(key)) return showToast('لقد تفاعلت مع هذا التطبيق بالفعل!');
   await updateDoc(doc(db, 'apps', currentApp.id), { likes: increment(1) });
   localStorage.setItem(key, 'true');
   currentApp.likes = (currentApp.likes || 0) + 1;
@@ -202,7 +256,7 @@ document.getElementById('modal-like-btn').onclick = async () => {
   fetchApps();
 };
 
-// الآراء
+// الآراء الحقيقية
 async function loadReviews(appId) {
   const rList = document.getElementById('reviews-list');
   rList.innerHTML = '<small style="color:var(--muted)">جاري جلب الآراء...</small>';
@@ -215,7 +269,7 @@ async function loadReviews(appId) {
   }
   rList.innerHTML = '';
   revs.forEach(r => {
-    rList.innerHTML += `<div class="review-box"><b>${r.name}</b><p style="margin:0">${r.text}</p></div>`;
+    rList.innerHTML += `<div class="review-item"><b>${r.name}</b><p>${r.text}</p></div>`;
   });
 }
 
@@ -225,13 +279,14 @@ document.getElementById('add-review-form').onsubmit = async (e) => {
   const text = document.getElementById('review-user-text').value;
   await addDoc(collection(db, `apps/${currentApp.id}/reviews`), { name, text, createdAt: serverTimestamp() });
   document.getElementById('add-review-form').reset();
-  showToast('تمت إضافة رأيك بنجاح!');
+  showToast('تم نشر رأيك بنجاح!');
   loadReviews(currentApp.id);
 };
 
-// 4. تحكم الأدمن في الإصدارات والحذف والتعديل
+// 4. أدوات الأدمن
 document.getElementById('admin-add-ver-btn').onclick = () => {
   document.getElementById('app-modal').classList.add('hidden');
+  document.body.style.overflow = 'auto';
   document.getElementById('ver-app-id').value = currentApp.id;
   document.getElementById('version-app-title').textContent = currentApp.name;
   document.getElementById('version-modal').classList.remove('hidden');
@@ -249,7 +304,7 @@ document.getElementById('version-form').onsubmit = async (e) => {
   if (snap.exists()) {
     const d = snap.data();
     const history = d.history || [];
-    history.unshift({ version: d.version, fileUrl: d.fileUrl }); // الإصدار القديم في السجل
+    history.unshift({ version: d.version, fileUrl: d.fileUrl });
     await updateDoc(appRef, { version: newVer, fileUrl: newUrl, history, updatedAt: serverTimestamp() });
     document.getElementById('version-modal').classList.add('hidden');
     document.getElementById('version-form').reset();
@@ -262,6 +317,7 @@ document.getElementById('admin-delete-app-btn').onclick = async () => {
   if (confirm(`هل أنت متأكد من حذف "${currentApp.name}" نهائياً؟`)) {
     await deleteDoc(doc(db, 'apps', currentApp.id));
     document.getElementById('app-modal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
     showToast('تم الحذف بنجاح!');
     fetchApps();
   }
@@ -269,6 +325,7 @@ document.getElementById('admin-delete-app-btn').onclick = async () => {
 
 document.getElementById('admin-edit-app-btn').onclick = () => {
   document.getElementById('app-modal').classList.add('hidden');
+  document.body.style.overflow = 'auto';
   document.getElementById('edit-id').value = currentApp.id;
   document.getElementById('app-name').value = currentApp.name;
   document.getElementById('app-category').value = currentApp.category;
@@ -287,7 +344,6 @@ document.getElementById('cancel-edit').onclick = () => {
   document.getElementById('save-app').textContent = 'نشر التطبيق';
 };
 
-// نشر التطبيق الجديد
 document.getElementById('app-form').onsubmit = async (e) => {
   e.preventDefault();
   const id = document.getElementById('edit-id').value;
@@ -352,7 +408,7 @@ document.querySelectorAll('.tool-tile').forEach(tile => {
   };
 });
 
-// تسجيل الدخول وحالة الأدمن
+// المصادقة
 onAuthStateChanged(auth, async user => {
   if (user) {
     document.getElementById('user-email').textContent = user.email;
