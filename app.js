@@ -14,7 +14,6 @@ function showToast(msg) {
   setTimeout(() => toastEl.classList.remove('show'), 3500);
 }
 
-// الثيم (Dark/Light)
 function toggleTheme() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
@@ -24,15 +23,9 @@ document.getElementById('theme-toggle').onclick = toggleTheme;
 document.getElementById('theme-toggle-mobile').onclick = toggleTheme;
 if (localStorage.getItem('kemo-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
 
-// فتح القائمة في الموبايل
 document.getElementById('menu-toggle').onclick = () => document.getElementById('nav').classList.toggle('open');
+document.querySelectorAll('.nav a').forEach(link => { link.onclick = () => document.getElementById('nav').classList.remove('open'); });
 
-// إخفاء القائمة عند النقر على أي رابط داخلها
-document.querySelectorAll('.nav a').forEach(link => {
-  link.onclick = () => document.getElementById('nav').classList.remove('open');
-});
-
-// العداد الحقيقي
 async function trackVisitor() {
   const vRef = doc(db, 'stats', 'visitors');
   try {
@@ -46,7 +39,6 @@ async function trackVisitor() {
 }
 trackVisitor();
 
-// تحميل بيانات المطور بدون أي أخطاء توقف الصفحة
 async function loadProfile() {
   try {
     const snap = await getDoc(doc(db, 'settings', 'profile'));
@@ -56,13 +48,10 @@ async function loadProfile() {
       if(d.tag) document.getElementById('profile-tag').textContent = d.tag;
       if(d.bio) document.getElementById('profile-bio').textContent = d.bio;
       if(d.img) document.getElementById('profile-img').src = d.img;
-      
-      // هنا تفادينا خطأ غياب الرابط
       if(d.fb && document.getElementById('link-facebook')) document.getElementById('link-facebook').href = d.fb;
       if(d.wa && document.getElementById('link-whatsapp')) document.getElementById('link-whatsapp').href = d.wa;
       if(d.ig && document.getElementById('link-instagram')) document.getElementById('link-instagram').href = d.ig;
       if(d.gh && document.getElementById('link-github')) document.getElementById('link-github').href = d.gh;
-
       if(document.getElementById('edit-profile-name')) {
         document.getElementById('edit-profile-name').value = d.name || '';
         document.getElementById('edit-profile-tag').value = d.tag || '';
@@ -73,11 +62,10 @@ async function loadProfile() {
         document.getElementById('edit-profile-gh').value = d.gh || '';
       }
     }
-  } catch(e) { console.error("Profile Load Error:", e); }
+  } catch(e) { console.error(e); }
 }
 loadProfile();
 
-// التطبيقات (التصليح اللي هيعالج مشكلة جاري التجهيز)
 let allApps = [];
 let currentApp = null;
 let isAdmin = false;
@@ -87,9 +75,8 @@ async function fetchApps() {
     const snap = await getDocs(query(collection(db, 'apps'), orderBy('createdAt', 'desc')));
     allApps = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     document.getElementById('app-count').textContent = allApps.length;
-    renderApps(); // ده هيرسم التطبيقات فوراً
+    renderApps();
   } catch(e) { 
-    console.error(e);
     document.getElementById('apps-grid').innerHTML = `<div class="empty-state">حدث خطأ في جلب البيانات</div>`; 
   }
 }
@@ -98,35 +85,23 @@ function renderApps(filter = 'all', search = '') {
   const grid = document.getElementById('apps-grid');
   grid.innerHTML = '';
   const filtered = allApps.filter(a => (filter === 'all' || a.category === filter) && a.name.toLowerCase().includes(search.toLowerCase()));
-
   if (!filtered.length) { grid.innerHTML = `<div class="empty-state">لا توجد تطبيقات</div>`; return; }
-
   filtered.forEach(app => {
     const card = document.createElement('div');
     card.className = 'app-card reveal visible';
     card.onclick = () => openAppView(app);
     card.innerHTML = `
-      <div class="app-cover">
-        ${app.coverUrl ? `<img src="${app.coverUrl}" alt="${app.name}">` : `<div class="cover-placeholder">✦</div>`}
-        <span class="app-tag">${app.category}</span>
-      </div>
+      <div class="app-cover">${app.coverUrl ? `<img src="${app.coverUrl}" alt="${app.name}">` : `<div class="cover-placeholder">✦</div>`}<span class="app-tag">${app.category}</span></div>
       <div class="app-body">
-        <div class="app-title-line">
-          <h3>${app.name}</h3>
-          <span class="app-version">v${app.version || '1.0'}</span>
-        </div>
+        <div class="app-title-line"><h3>${app.name}</h3><span class="app-version">v${app.version || '1.0'}</span></div>
         <p class="app-description">${app.description}</p>
-        <div class="app-card-actions">
-          <span>التفاصيل والتحميل ←</span>
-          <button class="quick-like-btn" onclick="handleQuickLike(event, '${app.id}')">♥ <span id="card-like-${app.id}">${app.likes || 0}</span></button>
-        </div>
+        <div class="app-card-actions"><span>التفاصيل والتحميل ←</span><button class="quick-like-btn" onclick="handleQuickLike(event, '${app.id}')">♥ <span id="card-like-${app.id}">${app.likes || 0}</span></button></div>
       </div>
     `;
     grid.appendChild(card);
   });
 }
 
-// اللايك
 window.handleQuickLike = async (e, appId) => {
   e.stopPropagation(); 
   const key = `liked_${appId}`;
@@ -140,7 +115,6 @@ window.handleQuickLike = async (e, appId) => {
   if(appIndex > -1) allApps[appIndex].likes = (allApps[appIndex].likes || 0) + 1;
 };
 
-// فتح التطبيق
 function openAppView(app) {
   currentApp = app;
   document.getElementById('home-view').classList.add('hidden');
@@ -187,7 +161,6 @@ function buildVersions(app) {
   }
 }
 
-// الآراء
 async function loadReviews(appId) {
   const rList = document.getElementById('reviews-list');
   rList.innerHTML = '<small>جاري جلب الآراء...</small>';
@@ -199,9 +172,7 @@ async function loadReviews(appId) {
   revs.forEach(r => { rList.innerHTML += `<div class="review-item"><b>${r.name}</b><p>${r.text}</p></div>`; });
 }
 
-// إدارة المصادقة (Auth) بجميع أزرارها للكمبيوتر والموبايل
 let isLoginMode = true;
-
 function openAuthForm(mode) {
   isLoginMode = (mode === 'login');
   document.getElementById('auth-title').textContent = isLoginMode ? 'تسجيل الدخول' : 'إنشاء حساب جديد';
@@ -211,30 +182,24 @@ function openAuthForm(mode) {
   document.getElementById('name-field').classList.toggle('hidden', isLoginMode);
   document.getElementById('forgot-password').classList.toggle('hidden', !isLoginMode);
   document.getElementById('auth-modal').classList.remove('hidden');
-  document.getElementById('nav').classList.remove('open'); // يقفل القائمة لو مفتوحة في الموبايل
+  document.getElementById('nav').classList.remove('open');
 }
 
-// أزرار الكمبيوتر
 document.getElementById('login-btn').onclick = () => openAuthForm('login');
 document.getElementById('signup-btn').onclick = () => openAuthForm('signup');
-// أزرار الموبايل (الجديدة)
 document.getElementById('mobile-login-btn').onclick = () => openAuthForm('login');
 document.getElementById('mobile-signup-btn').onclick = () => openAuthForm('signup');
-
 document.getElementById('auth-switch').onclick = (e) => { e.preventDefault(); openAuthForm(isLoginMode ? 'signup' : 'login'); };
 document.getElementById('auth-close').onclick = () => document.getElementById('auth-modal').classList.add('hidden');
 
-// حالة تسجيل الدخول
 onAuthStateChanged(auth, async user => {
   if (user) {
     document.getElementById('user-email').textContent = user.email;
     document.getElementById('mobile-user-email').textContent = user.email;
-    
     document.getElementById('login-btn').classList.add('hidden');
     document.getElementById('signup-btn').classList.add('hidden');
     document.getElementById('mobile-login-btn').classList.add('hidden');
     document.getElementById('mobile-signup-btn').classList.add('hidden');
-    
     document.getElementById('logout-btn').classList.remove('hidden');
     document.getElementById('mobile-logout-btn').classList.remove('hidden');
 
@@ -248,12 +213,10 @@ onAuthStateChanged(auth, async user => {
   } else {
     document.getElementById('user-email').textContent = '';
     document.getElementById('mobile-user-email').textContent = '';
-    
     document.getElementById('login-btn').classList.remove('hidden');
     document.getElementById('signup-btn').classList.remove('hidden');
     document.getElementById('mobile-login-btn').classList.remove('hidden');
     document.getElementById('mobile-signup-btn').classList.remove('hidden');
-    
     document.getElementById('logout-btn').classList.add('hidden');
     document.getElementById('mobile-logout-btn').classList.add('hidden');
     document.getElementById('admin-panel').classList.add('hidden');
@@ -261,5 +224,4 @@ onAuthStateChanged(auth, async user => {
   }
 });
 
-// تشغيل جلب التطبيقات عشان "جاري التجهيز" تختفي وتظهر الألعاب
 fetchApps();
