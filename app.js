@@ -15,6 +15,7 @@ function showToast(msg) {
   setTimeout(() => toastEl.classList.remove('show'), 3500);
 }
 
+// الثيم والموبايل
 function toggleTheme() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
@@ -30,6 +31,7 @@ const menuBtn = document.getElementById('menu-toggle');
 if(menuBtn) menuBtn.onclick = () => document.getElementById('nav')?.classList.toggle('open');
 document.querySelectorAll('.nav a').forEach(link => { link.onclick = () => document.getElementById('nav')?.classList.remove('open'); });
 
+// 1. عداد الزوار الحقيقي بالأرقام الإنجليزية
 async function trackVisitor() {
   const vRef = doc(db, 'stats', 'visitors');
   const countEl = document.getElementById('live-visitors-count');
@@ -39,11 +41,15 @@ async function trackVisitor() {
       sessionStorage.setItem('visited_session', 'true');
     }
     const snap = await getDoc(vRef);
-    if (snap.exists() && countEl) countEl.textContent = snap.data().count.toLocaleString('ar-EG');
+    if (snap.exists() && countEl) {
+      // عرض الرقم بالإنجليزية (en-US)
+      countEl.textContent = Number(snap.data().count).toLocaleString('en-US');
+    }
   } catch(e) { if(countEl) countEl.textContent = '1'; }
 }
 trackVisitor();
 
+// بيانات المطور
 async function loadProfile() {
   try {
     const snap = await getDoc(doc(db, 'settings', 'profile'));
@@ -141,6 +147,7 @@ function renderApps(filter = 'all', search = '') {
   });
 }
 
+// نظام اللايك (Toggle)
 window.handleQuickLike = async (e, appId) => {
   e.stopPropagation(); 
   const key = `liked_${appId}`;
@@ -253,29 +260,89 @@ if(detailLikeBtn) {
   };
 }
 
+// 2. نظام التقييم الحقيقي والتعليقات العامة المفتوحة للجميع
 async function loadReviews(appId) {
   const rList = document.getElementById('reviews-list');
-  rList.innerHTML = '<small>جاري جلب الآراء...</small>';
-  const snap = await getDocs(query(collection(db, `apps/${appId}/reviews`), orderBy('createdAt', 'desc')));
-  const revs = snap.docs.map(d => d.data());
-  document.getElementById('reviews-count').textContent = revs.length;
-  if (!revs.length) { rList.innerHTML = '<small style="color:var(--muted)">لا توجد آراء بعد. كن أول من يعلق!</small>'; return; }
-  rList.innerHTML = '';
-  revs.forEach(r => { rList.innerHTML += `<div class="review-item"><b>${r.name}</b><p>${r.text}</p></div>`; });
+  rList.innerHTML = '<small style="color:var(--muted)">جاري جلب الآراء الحقيقية والتقييمات...</small>';
+  
+  // حقن قائمة اختيار النجوم داخل الفورم برمجياً بدون ما تلمس الـ HTML
+  injectRatingSelector();
+
+  try {
+    const snap = await getDocs(query(collection(db, `apps/${appId}/reviews`), orderBy('createdAt', 'desc')));
+    const revs = snap.docs.map(d => d.data());
+    
+    // حساب متوسط التقييم الحقيقي
+    let totalStars = 0;
+    revs.forEach(r => totalStars += Number(r.rating || 5));
+    const avgScore = revs.length ? (totalStars / revs.length).toFixed(1) : '5.0';
+
+    document.getElementById('reviews-count').textContent = `${revs.length} تقييم • ⭐ ${avgScore} من 5`;
+
+    if (!revs.length) { 
+      rList.innerHTML = '<small style="color:var(--muted); display:block; padding:10px;">لا توجد تقييمات بعد. كن أول من يقيّم هذا التطبيق!</small>'; 
+      return; 
+    }
+
+    rList.innerHTML = '';
+    revs.forEach(r => { 
+      const starsDisplay = '⭐'.repeat(r.rating || 5);
+      rList.innerHTML += `
+        <div class="review-item">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+            <b>${r.name}</b>
+            <span style="font-size:12px;">${starsDisplay}</span>
+          </div>
+          <p>${r.text}</p>
+        </div>
+      `; 
+    });
+  } catch(e) {
+    rList.innerHTML = '<small style="color:var(--muted)">لا يمكن جلب التقييمات حالياً.</small>';
+  }
 }
 
+// دالة لوضع قائمة اختيار النجوم في الفورم تلقائياً
+function injectRatingSelector() {
+  const form = document.getElementById('add-review-form');
+  if (form && !document.getElementById('review-user-rating')) {
+    const select = document.createElement('select');
+    select.id = 'review-user-rating';
+    select.style.cssText = 'background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px; color:var(--ink); font-size:13px; font-weight:700; width:100%; margin-bottom:10px;';
+    select.innerHTML = `
+      <option value="5">⭐⭐⭐⭐⭐ (ممتاز 5/5)</option>
+      <option value="4">⭐⭐⭐⭐ (جيد جداً 4/5)</option>
+      <option value="3">⭐⭐⭐ (متوسط 3/5)</option>
+      <option value="2">⭐⭐ (ضعيف 2/5)</option>
+      <option value="1">⭐ (سيء 1/5)</option>
+    `;
+    const btn = form.querySelector('button[type="submit"]');
+    form.insertBefore(select, btn);
+  }
+}
+
+// نشر التقييم الحقيقي ليظهر للجميع فوراً
 document.getElementById('add-review-form').onsubmit = async (e) => {
   e.preventDefault();
+  const name = document.getElementById('review-user-name').value;
+  const text = document.getElementById('review-user-text').value;
+  const rating = Number(document.getElementById('review-user-rating')?.value || 5);
+
+  showToast('جاري نشر التقييم للعامة...');
+
   await addDoc(collection(db, `apps/${currentApp.id}/reviews`), {
-    name: document.getElementById('review-user-name').value,
-    text: document.getElementById('review-user-text').value,
+    name: name,
+    text: text,
+    rating: rating,
     createdAt: serverTimestamp()
   });
+
   document.getElementById('add-review-form').reset();
-  showToast('تم نشر تعليقك للجميع بنجاح!');
+  showToast('تم نشر تقييمك ليراه الجميع بنجاح! ⭐');
   loadReviews(currentApp.id);
 };
 
+// أدمن: إصدار جديد
 const adminAddVerBtn = document.getElementById('admin-add-ver-btn');
 if(adminAddVerBtn) adminAddVerBtn.onclick = () => {
   document.getElementById('ver-app-id').value = currentApp.id;
@@ -317,6 +384,7 @@ if(verForm) verForm.onsubmit = async (e) => {
   }
 };
 
+// أدمن: حذف وتعديل
 const delAppBtn = document.getElementById('admin-delete-app-btn');
 if(delAppBtn) delAppBtn.onclick = async () => {
   if (confirm(`حذف "${currentApp.name}" نهائياً؟`)) {
@@ -388,6 +456,7 @@ function fileToBase64(file) {
   });
 }
 
+// فلاتر البحث
 document.getElementById('search-input').oninput = e => renderApps(document.querySelector('.filter.active').dataset.category, e.target.value);
 document.querySelectorAll('.filter').forEach(btn => {
   btn.onclick = () => {
@@ -397,7 +466,7 @@ document.querySelectorAll('.filter').forEach(btn => {
   };
 });
 
-// نظام تسجيل الدخول وإخفاء زر نسيت كلمة المرور بذكاء
+// المصادقة
 let isLoginMode = true;
 function openAuthForm(mode) {
   isLoginMode = (mode === 'login');
@@ -413,17 +482,12 @@ function openAuthForm(mode) {
   const switchBtn = document.getElementById('auth-switch');
   if(switchBtn) switchBtn.textContent = isLoginMode ? 'حساب جديد' : 'تسجيل الدخول';
   
-  // إخفاء/إظهار حقل الاسم
   document.getElementById('name-field')?.classList.toggle('hidden', isLoginMode);
   
-  // إخفاء زر "نسيت كلمة المرور" في صفحة إنشاء حساب وإظهاره في صفحة الدخول
   const forgotBtn = document.getElementById('forgot-password');
   if(forgotBtn) {
-    if (isLoginMode) {
-      forgotBtn.classList.remove('hidden');
-    } else {
-      forgotBtn.classList.add('hidden');
-    }
+    if (isLoginMode) forgotBtn.classList.remove('hidden');
+    else forgotBtn.classList.add('hidden');
   }
 
   document.getElementById('auth-modal')?.classList.remove('hidden');
@@ -442,7 +506,6 @@ if(authSwitch) authSwitch.onclick = (e) => { e.preventDefault(); openAuthForm(is
 const authClose = document.getElementById('auth-close');
 if(authClose) authClose.onclick = () => document.getElementById('auth-modal')?.classList.add('hidden');
 
-// تسجيل الدخول / إنشاء حساب
 const authFormLog = document.getElementById('auth-form');
 if(authFormLog) authFormLog.onsubmit = async (e) => {
   e.preventDefault();
@@ -462,11 +525,11 @@ if(authFormLog) authFormLog.onsubmit = async (e) => {
   } catch(err) { showToast('خطأ: تأكد من صحة البيانات!'); }
 };
 
-// حل مشكلة نسيت كلمة المرور (فصل الزرار عن الفورم ليتم التنفيذ مباشرة)
+// نسيت كلمة المرور
 const forgotBtnMain = document.getElementById('forgot-password');
 if(forgotBtnMain) {
   forgotBtnMain.onclick = async (e) => {
-    e.preventDefault(); // منع الفورم من عمل Reload للصفحة
+    e.preventDefault();
     const email = document.getElementById('auth-email').value;
     if(!email) {
       showToast('يرجى كتابة بريدك الإلكتروني في الخانة أولاً، ثم الضغط هنا');
@@ -518,12 +581,53 @@ logoutBtns.forEach(id => {
   if(btn) btn.onclick = async () => { await signOut(auth); showToast('تم تسجيل الخروج'); };
 });
 
+// 3. نظام إرسال رسائل التواصل الحقيقي لبريدك
 const formC = document.getElementById('contact-form');
-if(formC) formC.onsubmit = e => {
-  e.preventDefault();
-  document.getElementById('contact-status').textContent = 'تم الإرسال بنجاح!';
-  e.target.reset();
-  setTimeout(() => document.getElementById('contact-status').textContent = '', 4000);
-};
+if(formC) {
+  formC.onsubmit = async (e) => {
+    e.preventDefault();
+    const statusEl = document.getElementById('contact-status');
+    const submitBtn = formC.querySelector('button[type="submit"]');
+
+    const name = document.getElementById('contact-name').value;
+    const email = document.getElementById('contact-email').value;
+    const message = document.getElementById('contact-message').value;
+
+    statusEl.textContent = 'جاري إرسال رسالتك للإيميل...';
+    statusEl.style.color = 'var(--accent)';
+    submitBtn.disabled = true;
+
+    try {
+      const res = await fetch("https://formsubmit.co/ajax/kareemammar2025@gmail.com", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          "اسم المرسل": name,
+          "بريد المرسل": email,
+          "الرسالة": message,
+          "_subject": "رسالة جديدة من زائر على منصة KEMO DEVELOPER!"
+        })
+      });
+
+      if (res.ok) {
+        statusEl.textContent = 'تم استلام رسالتك ووصلت لبريد المطور بنجاح!';
+        statusEl.style.color = '#10b981';
+        formC.reset();
+      } else {
+        statusEl.textContent = 'حدث خطأ، يرجى المحاولة لاحقاً.';
+        statusEl.style.color = '#ef4444';
+      }
+    } catch (err) {
+      statusEl.textContent = 'خطأ في الاتصال، تأكد من الإنترنت.';
+      statusEl.style.color = '#ef4444';
+    } finally {
+      submitBtn.disabled = false;
+      setTimeout(() => statusEl.textContent = '', 6000);
+    }
+  };
+}
 
 fetchApps();
