@@ -13,7 +13,6 @@
 <body>
   <div class="site-shell">
     
-    <!-- الهيدر -->
     <header class="header" id="top">
       <a class="logo" href="#" onclick="location.reload()">
         <span class="logo-symbol">K</span><span>KEMO<span class="logo-accent">.</span>DEVELOPER</span>
@@ -41,7 +40,7 @@
         <a href="#contact">تواصل</a>
         
         <div class="mobile-auth-actions hidden-desktop">
-          <span id="mobile-user-email" class="user-email-mobile"></span>
+          <span id="mobile-user-email" class="user-email-mobile" style="display:block; text-align:center; font-size:12px; margin-bottom:10px; color:var(--accent);"></span>
           <button id="mobile-login-btn" class="btn btn-outline full-width" style="margin-bottom: 8px;">تسجيل دخول</button>
           <button id="mobile-signup-btn" class="btn btn-dark full-width">إنشاء حساب</button>
           <button id="mobile-logout-btn" class="btn btn-outline full-width hidden">تسجيل خروج</button>
@@ -76,7 +75,6 @@
         </div>
       </section>
 
-      <!-- كارت المطور -->
       <section class="section-wrap" id="about-me" style="margin-top: 35px; margin-bottom: 30px;">
         <div class="developer-hero-card reveal">
           <div class="dev-card-ambient"></div>
@@ -100,7 +98,6 @@
         </div>
       </section>
 
-      <!-- التطبيقات -->
       <section class="section-wrap section-block" id="apps">
         <div class="section-heading reveal">
           <div><span class="eyebrow">المكتبة الرقمية</span><h2>استكشف <span class="gradient-text">التطبيقات</span></h2></div>
@@ -115,9 +112,20 @@
         </div>
         <div id="apps-grid" class="apps-grid"><div class="loading-state">جاري التجهيز...</div></div>
       </section>
+
+      <!-- الأقسام الأصلية المسترجعة -->
+      <section class="feature-band section-wrap reveal" id="updates">
+        <div class="feature-copy"><span class="eyebrow">ابقَ على اطلاع</span><h2>الجديد دائمًا<br><span class="gradient-text">في مكان واحد.</span></h2><p>تابع التحديثات المستمرة والتطبيقات المضافة حديثاً.</p><a class="btn btn-dark" href="#apps">شاهد الإضافات <span>←</span></a></div>
+        <div class="feature-stack"><div class="stack-card stack-one"><span class="stack-number">01</span><div><b>إصدارات جديدة</b><small>ألعاب وتطبيقات</small></div><span class="stack-arrow">↗</span></div><div class="stack-card stack-two"><span class="stack-number">02</span><div><b>تحميل مباشر</b><small>بدون إعلانات</small></div><span class="stack-arrow">↗</span></div></div>
+      </section>
+
+      <section class="contact-section section-wrap section-block" id="contact">
+        <div class="contact-copy reveal"><span class="eyebrow">تواصل معنا</span><h2>هل لديك <span class="gradient-text">استفسار؟</span></h2><p>يسعدنا استقبال رسائلك.</p></div>
+        <form class="contact-form reveal" id="contact-form"><label>الاسم<input id="contact-name" required></label><label>البريد<input id="contact-email" type="email" required></label><label>الرسالة<textarea id="contact-message" required rows="4"></textarea></label><button class="btn btn-dark" type="submit">إرسال <span>←</span></button><p id="contact-status" class="form-status"></p></form>
+      </section>
     </main>
 
-    <!-- صفحة التطبيق الكاملة (Full Page) -->
+    <!-- صفحة تفاصيل التطبيق -->
     <section id="app-details-view" class="fullpage-view hidden">
       <div class="fullpage-container section-wrap">
         <div class="fullpage-topbar">
@@ -138,7 +146,7 @@
         <div class="fullpage-body-grid">
           <div class="app-description-box">
             <h3>تفاصيل ومميزات الإصدار</h3>
-            <p id="detail-app-desc"></p>
+            <p id="detail-app-desc" style="white-space: pre-wrap;"></p>
           </div>
           <div class="versions-control-box">
             <h3>سجل الإصدارات والتحديثات</h3>
@@ -148,8 +156,9 @@
         <div class="reviews-section-full">
           <h3>آراء المستخدمين (<span id="reviews-count">0</span>)</h3>
           <div id="reviews-list" class="reviews-feed"></div>
+          <!-- تحسين فورم التعليقات للموبايل -->
           <form id="add-review-form" class="review-compose-form">
-            <input type="text" id="review-user-name" placeholder="اسمك" required>
+            <input type="text" id="review-user-name" placeholder="اسمك الكريم" required>
             <textarea id="review-user-text" placeholder="اكتب رأيك بصراحة..." rows="2" required></textarea>
             <button type="submit" class="btn btn-dark">نشر التعليق</button>
           </form>
@@ -173,7 +182,6 @@
           <div class="v-icon">⬆️</div>
           <div><h2>إضافة تحديث جديد</h2><p id="version-app-title" class="modal-subtitle"></p></div>
         </div>
-        <!-- فورم عمودي بسيط ومستقر على الموبايل -->
         <form id="version-form" class="admin-form-clean">
           <input type="hidden" id="ver-app-id">
           <label>رقم الإصدار<input id="new-ver-number" placeholder="مثال: 2.1" required></label>
@@ -181,12 +189,12 @@
           <label>صورة الغلاف (اختياري)<input id="new-ver-image" type="file" accept="image/*"></label>
           <label>رابط التحميل<input id="new-ver-url" type="url" placeholder="رابط الملف" required></label>
           <label>ما الجديد؟<textarea id="new-ver-notes" rows="3" required></textarea></label>
-          <button class="btn btn-dark full-width" type="submit">نشر الإصدار الجديد</button>
+          <button class="btn btn-dark full-width" type="submit" style="margin-top:10px;">نشر الإصدار الجديد</button>
         </form>
       </div>
     </div>
 
-    <!-- لوحة تحكم الأدمن (تم تبسيط وتنسيق الفورم للموبايل) -->
+    <!-- لوحة الإدارة -->
     <section id="admin-panel" class="admin-panel hidden section-wrap">
       <div class="admin-top">
         <div><span class="eyebrow">لوحة التحكم</span><h2>إدارة الموقع</h2></div>
@@ -195,10 +203,9 @@
           <button class="btn btn-outline small" id="show-profile-form-btn">تعديل ملفي</button>
         </div>
       </div>
-      
       <form id="app-form" class="admin-form-clean">
         <input id="edit-id" type="hidden">
-        <label>اسم التطبيق<input id="app-name" required></label>
+        <label>اسم التطبيق<input id="app-name" required maxlength="80"></label>
         <label>التصنيف<select id="app-category"><option>تطبيقات</option><option>ألعاب</option><option>أدوات</option></select></label>
         <label>الإصدار الأول<input id="app-version" required></label>
         <label>الغلاف<input id="app-image" type="file" accept="image/*"></label>
