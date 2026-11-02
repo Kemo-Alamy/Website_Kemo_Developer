@@ -276,10 +276,8 @@ document.getElementById('add-review-form').onsubmit = async (e) => {
   loadReviews(currentApp.id);
 };
 
-// أدمن: إصدار جديد (يفتح كـ Popup فوق الصفحة بدون إغلاقها)
 const adminAddVerBtn = document.getElementById('admin-add-ver-btn');
 if(adminAddVerBtn) adminAddVerBtn.onclick = () => {
-  // لم نعد نقوم بإخفاء app-details-view، ستظهر النافذة فوقها
   document.getElementById('ver-app-id').value = currentApp.id;
   document.getElementById('version-app-title').textContent = currentApp.name;
   document.getElementById('new-ver-name').value = currentApp.name; 
@@ -297,7 +295,7 @@ if(verForm) verForm.onsubmit = async (e) => {
   const newUrl = document.getElementById('new-ver-url').value;
   const newNotes = document.getElementById('new-ver-notes').value;
 
-  document.getElementById('version-modal')?.classList.add('hidden'); // إغلاق سريع
+  document.getElementById('version-modal')?.classList.add('hidden');
   showToast('جاري رفع الإصدار وتحديث الصفحة...'); 
 
   const appRef = doc(db, 'apps', id);
@@ -319,7 +317,6 @@ if(verForm) verForm.onsubmit = async (e) => {
   }
 };
 
-// أدمن: حذف وتعديل (سريع)
 const delAppBtn = document.getElementById('admin-delete-app-btn');
 if(delAppBtn) delAppBtn.onclick = async () => {
   if (confirm(`حذف "${currentApp.name}" نهائياً؟`)) {
@@ -400,7 +397,7 @@ document.querySelectorAll('.filter').forEach(btn => {
   };
 });
 
-// نظام تسجيل الدخول و إخفاء الإيميل تماماً عند الخروج
+// نظام تسجيل الدخول وإخفاء زر نسيت كلمة المرور بذكاء
 let isLoginMode = true;
 function openAuthForm(mode) {
   isLoginMode = (mode === 'login');
@@ -416,7 +413,19 @@ function openAuthForm(mode) {
   const switchBtn = document.getElementById('auth-switch');
   if(switchBtn) switchBtn.textContent = isLoginMode ? 'حساب جديد' : 'تسجيل الدخول';
   
+  // إخفاء/إظهار حقل الاسم
   document.getElementById('name-field')?.classList.toggle('hidden', isLoginMode);
+  
+  // إخفاء زر "نسيت كلمة المرور" في صفحة إنشاء حساب وإظهاره في صفحة الدخول
+  const forgotBtn = document.getElementById('forgot-password');
+  if(forgotBtn) {
+    if (isLoginMode) {
+      forgotBtn.classList.remove('hidden');
+    } else {
+      forgotBtn.classList.add('hidden');
+    }
+  }
+
   document.getElementById('auth-modal')?.classList.remove('hidden');
   document.getElementById('nav')?.classList.remove('open');
 }
@@ -433,6 +442,7 @@ if(authSwitch) authSwitch.onclick = (e) => { e.preventDefault(); openAuthForm(is
 const authClose = document.getElementById('auth-close');
 if(authClose) authClose.onclick = () => document.getElementById('auth-modal')?.classList.add('hidden');
 
+// تسجيل الدخول / إنشاء حساب
 const authFormLog = document.getElementById('auth-form');
 if(authFormLog) authFormLog.onsubmit = async (e) => {
   e.preventDefault();
@@ -445,27 +455,32 @@ if(authFormLog) authFormLog.onsubmit = async (e) => {
     } else {
       const cred = await createUserWithEmailAndPassword(auth, email, pass);
       await setDoc(doc(db, 'users', cred.user.uid), { email: cred.user.email, name: document.getElementById('display-name').value || '' });
-      showToast('تم إنشاء الحساب وتسجيل الدخول');
+      showToast('تم إنشاء الحساب بنجاح');
     }
     document.getElementById('auth-modal')?.classList.add('hidden');
     authFormLog.reset();
   } catch(err) { showToast('خطأ: تأكد من صحة البيانات!'); }
 };
 
-// زر استعادة كلمة المرور (فعّال)
-const forgotBtn = document.getElementById('forgot-password');
-if(forgotBtn) forgotBtn.onclick = async (e) => {
-  e.preventDefault();
-  const email = document.getElementById('auth-email').value;
-  if(!email) return showToast('يرجى كتابة بريدك الإلكتروني في الخانة العلوية أولاً');
-  try {
-    await sendPasswordResetEmail(auth, email);
-    document.getElementById('auth-modal')?.classList.add('hidden');
-    showToast('تم إرسال رابط آمن لاستعادة كلمة المرور إلى بريدك.');
-  } catch(err) { 
-    showToast('حدث خطأ: تأكد من كتابة البريد بشكل صحيح وأنه مسجل لدينا'); 
-  }
-};
+// حل مشكلة نسيت كلمة المرور (فصل الزرار عن الفورم ليتم التنفيذ مباشرة)
+const forgotBtnMain = document.getElementById('forgot-password');
+if(forgotBtnMain) {
+  forgotBtnMain.onclick = async (e) => {
+    e.preventDefault(); // منع الفورم من عمل Reload للصفحة
+    const email = document.getElementById('auth-email').value;
+    if(!email) {
+      showToast('يرجى كتابة بريدك الإلكتروني في الخانة أولاً، ثم الضغط هنا');
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      document.getElementById('auth-modal')?.classList.add('hidden');
+      showToast('تم إرسال رابط آمن لاستعادة كلمة المرور إلى بريدك!');
+    } catch(err) { 
+      showToast('حدث خطأ: تأكد أن البريد مكتوب بشكل صحيح ومسجل لدينا'); 
+    }
+  };
+}
 
 onAuthStateChanged(auth, async user => {
   const toggleVisibility = (id, hide) => { const el = document.getElementById(id); if(el) hide ? el.classList.add('hidden') : el.classList.remove('hidden'); };
@@ -486,7 +501,6 @@ onAuthStateChanged(auth, async user => {
       }
     } catch(e) { isAdmin = false; }
   } else {
-    // إخفاء الإيميل تماماً من الهيدر والموبايل
     if(document.getElementById('user-email')) { document.getElementById('user-email').textContent = ''; document.getElementById('user-email').style.display = 'none'; }
     if(document.getElementById('mobile-user-email')) { document.getElementById('mobile-user-email').textContent = ''; document.getElementById('mobile-user-email').style.display = 'none'; }
     
