@@ -24,7 +24,6 @@
   --shadow: 0 22px 65px rgba(0,0,0,0.3);
 }
 
-/* ================= أساسيات الموقع ================= */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { scroll-behavior: smooth; scroll-padding-top: 90px; background: var(--bg); color: var(--ink); font-family: 'Cairo', sans-serif; transition: background 0.25s, color 0.25s; overflow-x: hidden; width: 100%; }
 svg { max-width: 100%; height: auto; }
@@ -103,7 +102,7 @@ button, input, textarea, select { font: inherit; outline: none; }
 .dev-social-icon.ig:hover { color: #e1306c; border-color: #e1306c; }
 .dev-social-icon.gh:hover { color: var(--ink); border-color: var(--ink); }
 
-/* ================= الأقسام الأخرى (تطبيقات، جديد، تواصل) ================= */
+/* الأقسام والتطبيقات */
 .section-block { padding: 60px 0; }
 .section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;}
 .eyebrow { font-size: 11px; color: var(--accent); font-weight: 900; letter-spacing: 1px; display: block; margin-bottom: 5px; }
@@ -130,27 +129,8 @@ button, input, textarea, select { font: inherit; outline: none; }
 .quick-like-btn { background: var(--bg); color: #ff4d6d; border: 1px solid var(--line); padding: 6px 14px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: 800; transition: 0.2s; z-index: 5; }
 .quick-like-btn.liked, .quick-like-btn:hover { background: #ff4d6d; color: #fff; }
 
-/* قسم الجديد (Updates) - إصلاح التداخل */
-.feature-band { padding: 50px; background: var(--soft); border-radius: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
-.feature-copy h2 { font-size: 32px; margin: 0 0 10px; }
-.feature-copy p { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
-.feature-stack { display: flex; flex-direction: column; gap: 15px; }
-.stack-card { background: var(--surface); border: 1px solid var(--line); padding: 15px 20px; border-radius: 12px; display: flex; align-items: center; gap: 15px; box-shadow: var(--shadow); transition: 0.3s; }
-.stack-card:hover { transform: translateX(-10px); border-color: var(--accent); }
-.stack-number { font-size: 12px; font-weight: 900; color: var(--accent); }
-.stack-card div { flex: 1; }
-.stack-card b { font-size: 13px; display: block; }
-.stack-card small { font-size: 11px; color: var(--muted); }
-
-/* قسم التواصل (Contact) - إصلاح التداخل */
-.contact-section { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
-.contact-form { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 30px; display: flex; flex-direction: column; gap: 15px; box-shadow: var(--shadow); }
-.contact-form label { font-size: 12px; font-weight: 700; color: var(--muted); display: flex; flex-direction: column; gap: 8px; }
-.contact-form input, .contact-form textarea { width: 100%; background: var(--bg); border: 1px solid var(--line); padding: 12px; border-radius: 8px; font-size: 13px; color: var(--ink); transition: 0.2s; }
-.contact-form input:focus, .contact-form textarea:focus { border-color: var(--accent); }
-
-/* ================= صفحة التطبيق الكاملة (Full Page Overlay) ================= */
-.fullpage-view { position: fixed; inset: 0; background: var(--bg); z-index: 9990; overflow-y: auto; padding: 20px 5%; } /* Z-index أقل من المودال عشان التحديث يظهر فوقها */
+/* صفحة التطبيق الكاملة */
+.fullpage-view { position: fixed; inset: 0; background: var(--bg); z-index: 9999; overflow-y: auto; padding: 20px 5%; }
 .fullpage-container { max-width: 900px; margin: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: clamp(20px, 5vw, 40px); box-shadow: var(--shadow); }
 .fullpage-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--line); padding-bottom: 15px; }
 .back-btn { background: none; border: none; color: var(--accent); font-weight: 900; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 5px;}
@@ -184,7 +164,7 @@ button, input, textarea, select { font: inherit; outline: none; }
 .modal-admin-actions { border-top: 1px dashed var(--line); padding-top: 20px; margin-top: 30px;}
 .admin-inline-btns { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap;}
 
-/* ================= النوافذ والأدمن والفورمز (مبسط للموبايل) ================= */
+/* الفورم والمودال */
 .admin-panel { background: var(--surface); border: 1px solid var(--accent); border-radius: 20px; padding: 30px; margin: 40px auto; box-shadow: var(--shadow); }
 .admin-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
 .admin-form-clean { display: flex; flex-direction: column; gap: 15px; width: 100%; }
@@ -192,7 +172,7 @@ button, input, textarea, select { font: inherit; outline: none; }
 .admin-form-clean input, .admin-form-clean textarea, .admin-form-clean select { width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px 15px; color: var(--ink); font-size: 13px; box-sizing: border-box; }
 .admin-form-clean textarea { min-height: 90px; resize: vertical; }
 
-.modal { position: fixed; inset: 0; background: rgba(5,7,15,0.85); backdrop-filter: blur(10px); z-index: 10000; display: grid; place-items: center; padding: 15px; } /* Z-index أعلى من Fullpage */
+.modal { position: fixed; inset: 0; background: rgba(5,7,15,0.85); backdrop-filter: blur(10px); z-index: 10000; display: grid; place-items: center; padding: 15px; }
 .modal-card { width: min(450px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 35px; position: relative; box-shadow: var(--shadow); max-height: 95vh; overflow-y: auto; }
 .modal-close { position: absolute; left: 20px; top: 15px; font-size: 28px; background: none; border: none; color: var(--muted); cursor: pointer; z-index: 10;}
 
@@ -212,7 +192,7 @@ button, input, textarea, select { font: inherit; outline: none; }
 .reveal { animation: fadeInUp 0.8s ease forwards; }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ================= الموبايل (Responsive) ================= */
+/* ================= الموبايل ================= */
 .mobile-header-tools { display: none; align-items: center; gap: 15px; }
 .hidden-desktop { display: none; }
 
@@ -228,19 +208,16 @@ button, input, textarea, select { font: inherit; outline: none; }
   .hero { grid-template-columns: 1fr; text-align: center; gap: 20px; padding-top: 20px;}
   .hero-lead { margin-inline: auto; }
   .hero-buttons, .hero-meta { justify-content: center; }
+  
+  /* حل مشكلة تداخل الكروت العائمة في الموبايل برفعهم لأعلى */
+  .hero-visual { margin-top: 20px; }
   .app-window { width: 220px; height: 250px; }
+  .card-top { top: -15px; right: -5px; }
+  .card-bottom { bottom: 15px; left: -5px; }
   
   .developer-hero-card { grid-template-columns: 1fr; text-align: center; padding: 25px 15px;}
   .dev-social-dock { justify-content: center; }
   
-  /* إصلاح تداخل قسم الجديد والتواصل في الموبايل */
-  .feature-band { grid-template-columns: 1fr; text-align: center; padding: 30px 15px; gap: 20px; }
-  .feature-copy p { margin-inline: auto; }
-  .stack-card { transform: none !important; width: 100%; } /* منع تداخل الكروت */
-  
-  .contact-section { grid-template-columns: 1fr; text-align: center; gap: 20px; }
-  .contact-form { padding: 20px; }
-
   .fullpage-hero { flex-direction: column; text-align: center; }
   .action-buttons-group { justify-content: center; }
   .form-row { grid-template-columns: 1fr; }
