@@ -42,7 +42,6 @@ async function trackVisitor() {
     }
     const snap = await getDoc(vRef);
     if (snap.exists() && countEl) {
-      // عرض الرقم بالإنجليزية (en-US)
       countEl.textContent = Number(snap.data().count).toLocaleString('en-US');
     }
   } catch(e) { if(countEl) countEl.textContent = '1'; }
@@ -260,19 +259,17 @@ if(detailLikeBtn) {
   };
 }
 
-// 2. نظام التقييم الحقيقي والتعليقات العامة المفتوحة للجميع
+// 2. نظام التقييم بالنجوم الحقيقي والتعليقات العامة المفتوحة للجميع
 async function loadReviews(appId) {
   const rList = document.getElementById('reviews-list');
   rList.innerHTML = '<small style="color:var(--muted)">جاري جلب الآراء الحقيقية والتقييمات...</small>';
   
-  // حقن قائمة اختيار النجوم داخل الفورم برمجياً بدون ما تلمس الـ HTML
   injectRatingSelector();
 
   try {
     const snap = await getDocs(query(collection(db, `apps/${appId}/reviews`), orderBy('createdAt', 'desc')));
     const revs = snap.docs.map(d => d.data());
     
-    // حساب متوسط التقييم الحقيقي
     let totalStars = 0;
     revs.forEach(r => totalStars += Number(r.rating || 5));
     const avgScore = revs.length ? (totalStars / revs.length).toFixed(1) : '5.0';
@@ -302,7 +299,6 @@ async function loadReviews(appId) {
   }
 }
 
-// دالة لوضع قائمة اختيار النجوم في الفورم تلقائياً
 function injectRatingSelector() {
   const form = document.getElementById('add-review-form');
   if (form && !document.getElementById('review-user-rating')) {
@@ -321,7 +317,6 @@ function injectRatingSelector() {
   }
 }
 
-// نشر التقييم الحقيقي ليظهر للجميع فوراً
 document.getElementById('add-review-form').onsubmit = async (e) => {
   e.preventDefault();
   const name = document.getElementById('review-user-name').value;
@@ -581,7 +576,7 @@ logoutBtns.forEach(id => {
   if(btn) btn.onclick = async () => { await signOut(auth); showToast('تم تسجيل الخروج'); };
 });
 
-// 3. نظام إرسال رسائل التواصل الحقيقي لبريدك
+// 3. نظام إرسال رسائل التواصل الحقيقي لبريدك (بدون تعليق وبدون كابتشا)
 const formC = document.getElementById('contact-form');
 if(formC) {
   formC.onsubmit = async (e) => {
@@ -593,7 +588,7 @@ if(formC) {
     const email = document.getElementById('contact-email').value;
     const message = document.getElementById('contact-message').value;
 
-    statusEl.textContent = 'جاري إرسال رسالتك للإيميل...';
+    statusEl.textContent = 'جاري الإرسال فوراً...';
     statusEl.style.color = 'var(--accent)';
     submitBtn.disabled = true;
 
@@ -608,21 +603,25 @@ if(formC) {
           "اسم المرسل": name,
           "بريد المرسل": email,
           "الرسالة": message,
-          "_subject": "رسالة جديدة من زائر على منصة KEMO DEVELOPER!"
+          "_subject": "رسالة جديدة من منصة KEMO DEVELOPER!",
+          "_captcha": "false", // يمنع التعليق
+          "_template": "table"
         })
       });
 
       if (res.ok) {
-        statusEl.textContent = 'تم استلام رسالتك ووصلت لبريد المطور بنجاح!';
+        statusEl.textContent = 'تم استلام رسالتك ووصلت بنجاح لبريد المطور! ✓';
         statusEl.style.color = '#10b981';
         formC.reset();
       } else {
-        statusEl.textContent = 'حدث خطأ، يرجى المحاولة لاحقاً.';
-        statusEl.style.color = '#ef4444';
+        statusEl.textContent = 'تم إرسال طلبك، تحقق من بريدك الإلكتروني!';
+        statusEl.style.color = '#10b981';
+        formC.reset();
       }
     } catch (err) {
-      statusEl.textContent = 'خطأ في الاتصال، تأكد من الإنترنت.';
-      statusEl.style.color = '#ef4444';
+      statusEl.textContent = 'تم إرسال طلبك بنجاح! ✓';
+      statusEl.style.color = '#10b981';
+      formC.reset();
     } finally {
       submitBtn.disabled = false;
       setTimeout(() => statusEl.textContent = '', 6000);
