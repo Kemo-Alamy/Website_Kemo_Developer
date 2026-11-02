@@ -8,12 +8,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <!-- الربط الصحيح لملف التصميم -->
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="site-shell">
     
+    <!-- الهيدر -->
     <header class="header" id="top">
       <a class="logo" href="#" onclick="location.reload()">
         <span class="logo-symbol">K</span><span>KEMO<span class="logo-accent">.</span>DEVELOPER</span>
@@ -42,7 +42,7 @@
         
         <div class="mobile-auth-actions hidden-desktop">
           <span id="mobile-user-email" class="user-email-mobile"></span>
-          <button id="mobile-login-btn" class="btn btn-outline full-width">تسجيل دخول</button>
+          <button id="mobile-login-btn" class="btn btn-outline full-width" style="margin-bottom: 8px;">تسجيل دخول</button>
           <button id="mobile-signup-btn" class="btn btn-dark full-width">إنشاء حساب</button>
           <button id="mobile-logout-btn" class="btn btn-outline full-width hidden">تسجيل خروج</button>
         </div>
@@ -76,6 +76,7 @@
         </div>
       </section>
 
+      <!-- كارت المطور -->
       <section class="section-wrap" id="about-me" style="margin-top: 35px; margin-bottom: 30px;">
         <div class="developer-hero-card reveal">
           <div class="dev-card-ambient"></div>
@@ -99,6 +100,7 @@
         </div>
       </section>
 
+      <!-- التطبيقات -->
       <section class="section-wrap section-block" id="apps">
         <div class="section-heading reveal">
           <div><span class="eyebrow">المكتبة الرقمية</span><h2>استكشف <span class="gradient-text">التطبيقات</span></h2></div>
@@ -115,7 +117,7 @@
       </section>
     </main>
 
-    <!-- صفحة تفاصيل التطبيق -->
+    <!-- صفحة التطبيق الكاملة (Full Page) -->
     <section id="app-details-view" class="fullpage-view hidden">
       <div class="fullpage-container section-wrap">
         <div class="fullpage-topbar">
@@ -136,7 +138,7 @@
         <div class="fullpage-body-grid">
           <div class="app-description-box">
             <h3>تفاصيل ومميزات الإصدار</h3>
-            <p id="detail-app-desc" style="white-space: pre-wrap;"></p>
+            <p id="detail-app-desc"></p>
           </div>
           <div class="versions-control-box">
             <h3>سجل الإصدارات والتحديثات</h3>
@@ -163,7 +165,7 @@
       </div>
     </section>
 
-    <!-- النوافذ المنبثقة -->
+    <!-- نافذة إضافة إصدار جديد -->
     <div id="version-modal" class="modal hidden">
       <div class="modal-card version-modal-card">
         <button class="modal-close" id="version-modal-close">×</button>
@@ -171,21 +173,20 @@
           <div class="v-icon">⬆️</div>
           <div><h2>إضافة تحديث جديد</h2><p id="version-app-title" class="modal-subtitle"></p></div>
         </div>
-        <form id="version-form" class="version-fancy-form">
+        <!-- فورم عمودي بسيط ومستقر على الموبايل -->
+        <form id="version-form" class="admin-form-clean">
           <input type="hidden" id="ver-app-id">
-          <div class="form-row">
-            <div class="input-group"><input id="new-ver-number" placeholder=" " required><label>رقم الإصدار</label></div>
-            <div class="input-group"><input id="new-ver-name" placeholder=" " required><label>اسم التطبيق</label></div>
-          </div>
-          <div class="file-upload-group"><label>أيقونة الإصدار الجديد</label><input id="new-ver-image" type="file" accept="image/*"></div>
-          <div class="input-group"><input id="new-ver-url" type="url" placeholder=" " required><label>رابط التحميل</label></div>
-          <div class="input-group"><textarea id="new-ver-notes" rows="3" placeholder=" " required></textarea><label>ما الجديد؟</label></div>
-          <button class="btn btn-dark full-width" type="submit" style="margin-top:10px;">نشر الإصدار الجديد</button>
+          <label>رقم الإصدار<input id="new-ver-number" placeholder="مثال: 2.1" required></label>
+          <label>اسم التطبيق<input id="new-ver-name" placeholder="الاسم في هذا الإصدار" required></label>
+          <label>صورة الغلاف (اختياري)<input id="new-ver-image" type="file" accept="image/*"></label>
+          <label>رابط التحميل<input id="new-ver-url" type="url" placeholder="رابط الملف" required></label>
+          <label>ما الجديد؟<textarea id="new-ver-notes" rows="3" required></textarea></label>
+          <button class="btn btn-dark full-width" type="submit">نشر الإصدار الجديد</button>
         </form>
       </div>
     </div>
 
-    <!-- لوحة الإدارة -->
+    <!-- لوحة تحكم الأدمن (تم تبسيط وتنسيق الفورم للموبايل) -->
     <section id="admin-panel" class="admin-panel hidden section-wrap">
       <div class="admin-top">
         <div><span class="eyebrow">لوحة التحكم</span><h2>إدارة الموقع</h2></div>
@@ -194,30 +195,31 @@
           <button class="btn btn-outline small" id="show-profile-form-btn">تعديل ملفي</button>
         </div>
       </div>
-      <form id="app-form" class="admin-form">
+      
+      <form id="app-form" class="admin-form-clean">
         <input id="edit-id" type="hidden">
-        <label>اسم التطبيق<input id="app-name" required maxlength="80"></label>
+        <label>اسم التطبيق<input id="app-name" required></label>
         <label>التصنيف<select id="app-category"><option>تطبيقات</option><option>ألعاب</option><option>أدوات</option></select></label>
         <label>الإصدار الأول<input id="app-version" required></label>
         <label>الغلاف<input id="app-image" type="file" accept="image/*"></label>
-        <label class="wide">رابط التحميل<input id="app-file" type="url" required></label>
-        <label class="wide">الوصف<textarea id="app-description" required rows="3"></textarea></label>
-        <div class="admin-form-actions wide">
-          <button class="btn btn-dark" id="save-app" type="submit">حفظ التطبيق</button>
-          <button class="btn btn-outline hidden" id="cancel-edit" type="button">إلغاء</button>
+        <label>رابط التحميل<input id="app-file" type="url" required></label>
+        <label>الوصف<textarea id="app-description" required rows="3"></textarea></label>
+        <div style="display:flex; gap:10px; margin-top: 10px;">
+          <button class="btn btn-dark" id="save-app" type="submit" style="flex:1;">حفظ التطبيق</button>
+          <button class="btn btn-outline hidden" id="cancel-edit" type="button" style="flex:1;">إلغاء</button>
         </div>
       </form>
 
-      <form id="profile-form" class="admin-form hidden">
+      <form id="profile-form" class="admin-form-clean hidden">
         <label>الاسم الظاهر<input id="edit-profile-name" required></label>
         <label>اللقب<input id="edit-profile-tag" required></label>
-        <label class="wide">نبذة<textarea id="edit-profile-bio" rows="3" required></textarea></label>
+        <label>نبذة<textarea id="edit-profile-bio" rows="3" required></textarea></label>
         <label>الصورة<input id="edit-profile-img" type="file" accept="image/*"></label>
         <label>فيسبوك<input id="edit-profile-fb" type="url"></label>
         <label>واتساب<input id="edit-profile-wa" type="url"></label>
         <label>انستجرام<input id="edit-profile-ig" type="url"></label>
         <label>جيت هاب<input id="edit-profile-gh" type="url"></label>
-        <div class="admin-form-actions wide"><button class="btn btn-dark" type="submit">حفظ الملف</button></div>
+        <button class="btn btn-dark full-width" type="submit" style="margin-top: 10px;">حفظ الملف</button>
       </form>
     </section>
 
@@ -229,20 +231,22 @@
           <div class="auth-logo">K.</div>
           <h2 id="auth-title">تسجيل الدخول</h2>
         </div>
-        <form id="auth-form" class="modern-auth-form">
-          <div class="input-group hidden" id="name-field"><input id="display-name" autocomplete="name" placeholder=" "><label>الاسم الكريم</label></div>
-          <div class="input-group"><input id="auth-email" type="email" autocomplete="email" placeholder=" " required><label>البريد الإلكتروني</label></div>
-          <div class="input-group" id="pass-field"><input id="auth-password" type="password" minlength="6" placeholder=" " required><label>كلمة المرور</label></div>
-          <button class="btn btn-dark full-width auth-btn" id="auth-submit">دخول</button>
+        <form id="auth-form" class="admin-form-clean" style="text-align: right;">
+          <label id="name-field" class="hidden">الاسم<input id="display-name" autocomplete="name"></label>
+          <label>البريد الإلكتروني<input id="auth-email" type="email" autocomplete="email" required></label>
+          <label id="pass-field">كلمة المرور<input id="auth-password" type="password" minlength="6" required></label>
+          <button class="btn btn-dark full-width" id="auth-submit" style="margin-top: 10px;">دخول</button>
         </form>
-        <button class="text-action" id="forgot-password">نسيت كلمة المرور؟</button>
-        <div class="auth-footer"><span id="switch-label">ليس لديك حساب؟</span><button id="auth-switch">حساب جديد</button></div>
+        <button class="text-action" id="forgot-password" style="margin-top: 15px; background:none; border:none; color:var(--accent); font-weight:700; cursor:pointer;">نسيت كلمة المرور؟</button>
+        <div class="auth-footer" style="margin-top: 20px; border-top: 1px solid var(--line); padding-top: 15px; font-size: 11px;">
+          <span id="switch-label">ليس لديك حساب؟</span>
+          <button id="auth-switch" style="background:none; border:none; color:var(--accent); font-weight:800; cursor:pointer;">حساب جديد</button>
+        </div>
       </div>
     </div>
     
     <div id="toast" class="toast"></div>
   </div>
-  <!-- الربط الصحيح لملف الجافاسكريبت بدون نقطة -->
   <script type="module" src="app.js"></script>
 </body>
 </html>
