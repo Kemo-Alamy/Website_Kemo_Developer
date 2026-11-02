@@ -12,10 +12,9 @@ function showToast(msg) {
   if(!toastEl) return;
   toastEl.textContent = msg;
   toastEl.classList.add('show');
-  setTimeout(() => toastEl.classList.remove('show'), 3000);
+  setTimeout(() => toastEl.classList.remove('show'), 3500);
 }
 
-// الثيم والموبايل
 function toggleTheme() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
@@ -31,7 +30,6 @@ const menuBtn = document.getElementById('menu-toggle');
 if(menuBtn) menuBtn.onclick = () => document.getElementById('nav')?.classList.toggle('open');
 document.querySelectorAll('.nav a').forEach(link => { link.onclick = () => document.getElementById('nav')?.classList.remove('open'); });
 
-// العداد
 async function trackVisitor() {
   const vRef = doc(db, 'stats', 'visitors');
   const countEl = document.getElementById('live-visitors-count');
@@ -46,7 +44,6 @@ async function trackVisitor() {
 }
 trackVisitor();
 
-// بيانات المطور
 async function loadProfile() {
   try {
     const snap = await getDoc(doc(db, 'settings', 'profile'));
@@ -102,7 +99,6 @@ const showProfBtn = document.getElementById('show-profile-form-btn');
 if(showAppBtn) showAppBtn.onclick = () => { document.getElementById('app-form')?.classList.remove('hidden'); document.getElementById('profile-form')?.classList.add('hidden'); };
 if(showProfBtn) showProfBtn.onclick = () => { document.getElementById('app-form')?.classList.add('hidden'); document.getElementById('profile-form')?.classList.remove('hidden'); };
 
-// التطبيقات
 let allApps = [];
 let currentApp = null;
 let isAdmin = false;
@@ -145,7 +141,6 @@ function renderApps(filter = 'all', search = '') {
   });
 }
 
-// نظام اللايك
 window.handleQuickLike = async (e, appId) => {
   e.stopPropagation(); 
   const key = `liked_${appId}`;
@@ -258,7 +253,6 @@ if(detailLikeBtn) {
   };
 }
 
-// الآراء
 async function loadReviews(appId) {
   const rList = document.getElementById('reviews-list');
   rList.innerHTML = '<small>جاري جلب الآراء...</small>';
@@ -282,9 +276,10 @@ document.getElementById('add-review-form').onsubmit = async (e) => {
   loadReviews(currentApp.id);
 };
 
-// أدمن: إصدار جديد
+// أدمن: إصدار جديد (يفتح كـ Popup فوق الصفحة بدون إغلاقها)
 const adminAddVerBtn = document.getElementById('admin-add-ver-btn');
 if(adminAddVerBtn) adminAddVerBtn.onclick = () => {
+  // لم نعد نقوم بإخفاء app-details-view، ستظهر النافذة فوقها
   document.getElementById('ver-app-id').value = currentApp.id;
   document.getElementById('version-app-title').textContent = currentApp.name;
   document.getElementById('new-ver-name').value = currentApp.name; 
@@ -302,13 +297,12 @@ if(verForm) verForm.onsubmit = async (e) => {
   const newUrl = document.getElementById('new-ver-url').value;
   const newNotes = document.getElementById('new-ver-notes').value;
 
+  document.getElementById('version-modal')?.classList.add('hidden'); // إغلاق سريع
+  showToast('جاري رفع الإصدار وتحديث الصفحة...'); 
+
   const appRef = doc(db, 'apps', id);
   const snap = await getDoc(appRef);
   if (snap.exists()) {
-    document.getElementById('version-modal')?.classList.add('hidden');
-    document.getElementById('app-details-back')?.click();
-    showToast('جاري رفع الإصدار...'); // استجابة سريعة
-
     const d = snap.data();
     const history = d.history || [];
     history.unshift({ version: d.version, name: d.name, coverUrl: d.coverUrl, fileUrl: d.fileUrl, releaseNotes: d.releaseNotes || d.description });
@@ -320,6 +314,7 @@ if(verForm) verForm.onsubmit = async (e) => {
     await updateDoc(appRef, updatedData);
     verForm.reset();
     showToast('تمت إضافة التحديث بنجاح!');
+    document.getElementById('app-details-back')?.click();
     fetchApps();
   }
 };
@@ -396,7 +391,6 @@ function fileToBase64(file) {
   });
 }
 
-// فلاتر البحث
 document.getElementById('search-input').oninput = e => renderApps(document.querySelector('.filter.active').dataset.category, e.target.value);
 document.querySelectorAll('.filter').forEach(btn => {
   btn.onclick = () => {
@@ -406,7 +400,7 @@ document.querySelectorAll('.filter').forEach(btn => {
   };
 });
 
-// نظام تسجيل الدخول محمي وإخفاء الإيميل صح
+// نظام تسجيل الدخول و إخفاء الإيميل تماماً عند الخروج
 let isLoginMode = true;
 function openAuthForm(mode) {
   isLoginMode = (mode === 'login');
@@ -458,17 +452,19 @@ if(authFormLog) authFormLog.onsubmit = async (e) => {
   } catch(err) { showToast('خطأ: تأكد من صحة البيانات!'); }
 };
 
-// حل مشكلة نسيت كلمة المرور
+// زر استعادة كلمة المرور (فعّال)
 const forgotBtn = document.getElementById('forgot-password');
 if(forgotBtn) forgotBtn.onclick = async (e) => {
   e.preventDefault();
   const email = document.getElementById('auth-email').value;
-  if(!email) return showToast('يرجى كتابة البريد في الخانة أولاً، ثم الضغط هنا');
+  if(!email) return showToast('يرجى كتابة بريدك الإلكتروني في الخانة العلوية أولاً');
   try {
     await sendPasswordResetEmail(auth, email);
     document.getElementById('auth-modal')?.classList.add('hidden');
-    showToast('تم إرسال رابط آمن لاستعادة كلمة المرور لبريدك.');
-  } catch(err) { showToast('حدث خطأ: تأكد أن البريد مسجل لدينا'); }
+    showToast('تم إرسال رابط آمن لاستعادة كلمة المرور إلى بريدك.');
+  } catch(err) { 
+    showToast('حدث خطأ: تأكد من كتابة البريد بشكل صحيح وأنه مسجل لدينا'); 
+  }
 };
 
 onAuthStateChanged(auth, async user => {
@@ -490,7 +486,7 @@ onAuthStateChanged(auth, async user => {
       }
     } catch(e) { isAdmin = false; }
   } else {
-    // إخفاء الإيميل تماماً عند الخروج
+    // إخفاء الإيميل تماماً من الهيدر والموبايل
     if(document.getElementById('user-email')) { document.getElementById('user-email').textContent = ''; document.getElementById('user-email').style.display = 'none'; }
     if(document.getElementById('mobile-user-email')) { document.getElementById('mobile-user-email').textContent = ''; document.getElementById('mobile-user-email').style.display = 'none'; }
     
