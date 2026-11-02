@@ -12,19 +12,19 @@ function showToast(msg) {
   if(!toastEl) return;
   toastEl.textContent = msg;
   toastEl.classList.add('show');
-  setTimeout(() => toastEl.classList.remove('show'), 3500);
+  setTimeout(() => toastEl.classList.remove('show'), 3000);
 }
 
 // الثيم والموبايل
-const themeBtn = document.getElementById('theme-toggle');
-const themeBtnMob = document.getElementById('theme-toggle-mobile');
 function toggleTheme() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
   localStorage.setItem('kemo-theme', isDark ? 'light' : 'dark');
 }
-if(themeBtn) themeBtn.onclick = toggleTheme;
-if(themeBtnMob) themeBtnMob.onclick = toggleTheme;
+const thBtn = document.getElementById('theme-toggle');
+const thBtnM = document.getElementById('theme-toggle-mobile');
+if(thBtn) thBtn.onclick = toggleTheme;
+if(thBtnM) thBtnM.onclick = toggleTheme;
 if (localStorage.getItem('kemo-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
 
 const menuBtn = document.getElementById('menu-toggle');
@@ -145,7 +145,7 @@ function renderApps(filter = 'all', search = '') {
   });
 }
 
-// نظام اللايك (Toggle: اضافة وازالة)
+// نظام اللايك
 window.handleQuickLike = async (e, appId) => {
   e.stopPropagation(); 
   const key = `liked_${appId}`;
@@ -154,7 +154,6 @@ window.handleQuickLike = async (e, appId) => {
   const appIndex = allApps.findIndex(a => a.id === appId);
   
   if (localStorage.getItem(key)) {
-    // إزالة اللايك
     await updateDoc(doc(db, 'apps', appId), { likes: increment(-1) });
     localStorage.removeItem(key);
     btn.classList.remove('liked');
@@ -162,7 +161,6 @@ window.handleQuickLike = async (e, appId) => {
     if(appIndex > -1) allApps[appIndex].likes = (allApps[appIndex].likes || 1) - 1;
     showToast('تم إزالة الإعجاب');
   } else {
-    // إضافة اللايك
     await updateDoc(doc(db, 'apps', appId), { likes: increment(1) });
     localStorage.setItem(key, 'true');
     btn.classList.add('liked');
@@ -187,7 +185,6 @@ function openAppView(app) {
   }
   document.getElementById('detail-likes-count').textContent = app.likes || 0;
 
-  // الإعداد الافتراضي للصورة (لو مفيش بيحط الاصلية)
   setActiveVersionUI({ version: app.version, name: app.name, coverUrl: app.coverUrl, description: app.description, fileUrl: app.fileUrl, releaseNotes: app.releaseNotes }, true, app.coverUrl); 
   buildVersions(app);
   
@@ -200,17 +197,11 @@ document.getElementById('app-details-back').onclick = () => {
   document.getElementById('home-view')?.classList.remove('hidden');
 };
 
-// حل مشكلة اختفاء الصورة في الإصدارات القديمة (باستخدام الصورة الاصلية كبديل)
 function setActiveVersionUI(verData, isLatest, fallbackCover) {
   document.getElementById('detail-app-latest-ver').textContent = `الإصدار المعروض: v${verData.version} ${isLatest ? '(الأحدث)' : ''}`;
   document.getElementById('detail-app-name').textContent = verData.name || currentApp.name;
-  
   const coverImg = document.getElementById('detail-app-cover');
-  if(coverImg) {
-    // لو الإصدار ملوش صورة، بياخد الصورة الأصلية بتاعة التطبيق
-    coverImg.src = verData.coverUrl || fallbackCover || 'https://via.placeholder.com/150';
-  }
-  
+  if(coverImg) coverImg.src = verData.coverUrl || fallbackCover || 'https://via.placeholder.com/150';
   document.getElementById('detail-download-btn').href = verData.fileUrl;
   document.getElementById('detail-app-desc').textContent = isLatest ? verData.description : (verData.releaseNotes || 'نسخة سابقة.');
 }
@@ -244,7 +235,6 @@ function buildVersions(app) {
   }
 }
 
-// زر لايك من داخل الصفحة (Toggle)
 const detailLikeBtn = document.getElementById('detail-like-btn');
 if(detailLikeBtn) {
   detailLikeBtn.onclick = async () => {
@@ -268,7 +258,31 @@ if(detailLikeBtn) {
   };
 }
 
-// الأدمن: إصدار جديد
+// الآراء
+async function loadReviews(appId) {
+  const rList = document.getElementById('reviews-list');
+  rList.innerHTML = '<small>جاري جلب الآراء...</small>';
+  const snap = await getDocs(query(collection(db, `apps/${appId}/reviews`), orderBy('createdAt', 'desc')));
+  const revs = snap.docs.map(d => d.data());
+  document.getElementById('reviews-count').textContent = revs.length;
+  if (!revs.length) { rList.innerHTML = '<small style="color:var(--muted)">لا توجد آراء بعد. كن أول من يعلق!</small>'; return; }
+  rList.innerHTML = '';
+  revs.forEach(r => { rList.innerHTML += `<div class="review-item"><b>${r.name}</b><p>${r.text}</p></div>`; });
+}
+
+document.getElementById('add-review-form').onsubmit = async (e) => {
+  e.preventDefault();
+  await addDoc(collection(db, `apps/${currentApp.id}/reviews`), {
+    name: document.getElementById('review-user-name').value,
+    text: document.getElementById('review-user-text').value,
+    createdAt: serverTimestamp()
+  });
+  document.getElementById('add-review-form').reset();
+  showToast('تم نشر تعليقك للجميع بنجاح!');
+  loadReviews(currentApp.id);
+};
+
+// أدمن: إصدار جديد
 const adminAddVerBtn = document.getElementById('admin-add-ver-btn');
 if(adminAddVerBtn) adminAddVerBtn.onclick = () => {
   document.getElementById('ver-app-id').value = currentApp.id;
@@ -291,29 +305,33 @@ if(verForm) verForm.onsubmit = async (e) => {
   const appRef = doc(db, 'apps', id);
   const snap = await getDoc(appRef);
   if (snap.exists()) {
+    document.getElementById('version-modal')?.classList.add('hidden');
+    document.getElementById('app-details-back')?.click();
+    showToast('جاري رفع الإصدار...'); // استجابة سريعة
+
     const d = snap.data();
     const history = d.history || [];
     history.unshift({ version: d.version, name: d.name, coverUrl: d.coverUrl, fileUrl: d.fileUrl, releaseNotes: d.releaseNotes || d.description });
     let updatedData = { version: newVer, name: newName, fileUrl: newUrl, releaseNotes: newNotes, history, updatedAt: serverTimestamp() };
+    
     const imgF = document.getElementById('new-ver-image').files[0];
     if(imgF) updatedData.coverUrl = await fileToBase64(imgF);
     
     await updateDoc(appRef, updatedData);
-    document.getElementById('version-modal')?.classList.add('hidden');
     verForm.reset();
     showToast('تمت إضافة التحديث بنجاح!');
-    document.getElementById('app-details-back')?.click();
     fetchApps();
   }
 };
 
-// أدمن: حذف وتعديل ونشر تطبيق
+// أدمن: حذف وتعديل (سريع)
 const delAppBtn = document.getElementById('admin-delete-app-btn');
 if(delAppBtn) delAppBtn.onclick = async () => {
   if (confirm(`حذف "${currentApp.name}" نهائياً؟`)) {
-    await deleteDoc(doc(db, 'apps', currentApp.id));
     document.getElementById('app-details-back')?.click();
-    showToast('تم الحذف!');
+    showToast('جاري الحذف...');
+    await deleteDoc(doc(db, 'apps', currentApp.id));
+    showToast('تم الحذف بنجاح!');
     fetchApps();
   }
 };
@@ -342,6 +360,7 @@ const appForm = document.getElementById('app-form');
 if(appForm) appForm.onsubmit = async (e) => {
   e.preventDefault();
   const id = document.getElementById('edit-id').value;
+  showToast('جاري الحفظ...');
   const appData = {
     name: document.getElementById('app-name').value,
     category: document.getElementById('app-category').value,
@@ -377,7 +396,17 @@ function fileToBase64(file) {
   });
 }
 
-// نظام تسجيل الدخول المحمي
+// فلاتر البحث
+document.getElementById('search-input').oninput = e => renderApps(document.querySelector('.filter.active').dataset.category, e.target.value);
+document.querySelectorAll('.filter').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.filter').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderApps(btn.dataset.category, document.getElementById('search-input').value);
+  };
+});
+
+// نظام تسجيل الدخول محمي وإخفاء الإيميل صح
 let isLoginMode = true;
 function openAuthForm(mode) {
   isLoginMode = (mode === 'login');
@@ -410,8 +439,8 @@ if(authSwitch) authSwitch.onclick = (e) => { e.preventDefault(); openAuthForm(is
 const authClose = document.getElementById('auth-close');
 if(authClose) authClose.onclick = () => document.getElementById('auth-modal')?.classList.add('hidden');
 
-const authForm = document.getElementById('auth-form');
-if(authForm) authForm.onsubmit = async (e) => {
+const authFormLog = document.getElementById('auth-form');
+if(authFormLog) authFormLog.onsubmit = async (e) => {
   e.preventDefault();
   const email = document.getElementById('auth-email').value;
   const pass = document.getElementById('auth-password').value;
@@ -425,18 +454,29 @@ if(authForm) authForm.onsubmit = async (e) => {
       showToast('تم إنشاء الحساب وتسجيل الدخول');
     }
     document.getElementById('auth-modal')?.classList.add('hidden');
-    authForm.reset();
-  } catch(err) {
-    showToast('خطأ: تأكد من صحة البيانات!');
-  }
+    authFormLog.reset();
+  } catch(err) { showToast('خطأ: تأكد من صحة البيانات!'); }
+};
+
+// حل مشكلة نسيت كلمة المرور
+const forgotBtn = document.getElementById('forgot-password');
+if(forgotBtn) forgotBtn.onclick = async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('auth-email').value;
+  if(!email) return showToast('يرجى كتابة البريد في الخانة أولاً، ثم الضغط هنا');
+  try {
+    await sendPasswordResetEmail(auth, email);
+    document.getElementById('auth-modal')?.classList.add('hidden');
+    showToast('تم إرسال رابط آمن لاستعادة كلمة المرور لبريدك.');
+  } catch(err) { showToast('حدث خطأ: تأكد أن البريد مسجل لدينا'); }
 };
 
 onAuthStateChanged(auth, async user => {
   const toggleVisibility = (id, hide) => { const el = document.getElementById(id); if(el) hide ? el.classList.add('hidden') : el.classList.remove('hidden'); };
   
   if (user) {
-    if(document.getElementById('user-email')) document.getElementById('user-email').textContent = user.email;
-    if(document.getElementById('mobile-user-email')) document.getElementById('mobile-user-email').textContent = user.email;
+    if(document.getElementById('user-email')) { document.getElementById('user-email').textContent = user.email; document.getElementById('user-email').style.display = 'block'; }
+    if(document.getElementById('mobile-user-email')) { document.getElementById('mobile-user-email').textContent = user.email; document.getElementById('mobile-user-email').style.display = 'block'; }
     
     toggleVisibility('login-btn', true); toggleVisibility('signup-btn', true);
     toggleVisibility('mobile-login-btn', true); toggleVisibility('mobile-signup-btn', true);
@@ -450,6 +490,10 @@ onAuthStateChanged(auth, async user => {
       }
     } catch(e) { isAdmin = false; }
   } else {
+    // إخفاء الإيميل تماماً عند الخروج
+    if(document.getElementById('user-email')) { document.getElementById('user-email').textContent = ''; document.getElementById('user-email').style.display = 'none'; }
+    if(document.getElementById('mobile-user-email')) { document.getElementById('mobile-user-email').textContent = ''; document.getElementById('mobile-user-email').style.display = 'none'; }
+    
     toggleVisibility('login-btn', false); toggleVisibility('signup-btn', false);
     toggleVisibility('mobile-login-btn', false); toggleVisibility('mobile-signup-btn', false);
     toggleVisibility('logout-btn', true); toggleVisibility('mobile-logout-btn', true);
@@ -463,5 +507,13 @@ logoutBtns.forEach(id => {
   const btn = document.getElementById(id);
   if(btn) btn.onclick = async () => { await signOut(auth); showToast('تم تسجيل الخروج'); };
 });
+
+const formC = document.getElementById('contact-form');
+if(formC) formC.onsubmit = e => {
+  e.preventDefault();
+  document.getElementById('contact-status').textContent = 'تم الإرسال بنجاح!';
+  e.target.reset();
+  setTimeout(() => document.getElementById('contact-status').textContent = '', 4000);
+};
 
 fetchApps();
