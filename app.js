@@ -15,7 +15,7 @@ function showToast(msg) {
   setTimeout(() => toastEl.classList.remove('show'), 3500);
 }
 
-// الثيم والموبايل
+// الثيم
 function toggleTheme() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
@@ -31,7 +31,7 @@ const menuBtn = document.getElementById('menu-toggle');
 if(menuBtn) menuBtn.onclick = () => document.getElementById('nav')?.classList.toggle('open');
 document.querySelectorAll('.nav a').forEach(link => { link.onclick = () => document.getElementById('nav')?.classList.remove('open'); });
 
-// 1. عداد الزوار الحقيقي بالأرقام الإنجليزية
+// عداد الزيارات
 async function trackVisitor() {
   const vRef = doc(db, 'stats', 'visitors');
   const countEl = document.getElementById('live-visitors-count');
@@ -41,14 +41,12 @@ async function trackVisitor() {
       sessionStorage.setItem('visited_session', 'true');
     }
     const snap = await getDoc(vRef);
-    if (snap.exists() && countEl) {
-      countEl.textContent = Number(snap.data().count).toLocaleString('en-US');
-    }
+    if (snap.exists() && countEl) countEl.textContent = Number(snap.data().count).toLocaleString('en-US');
   } catch(e) { if(countEl) countEl.textContent = '1'; }
 }
 trackVisitor();
 
-// بيانات المطور
+// ملف المطور
 async function loadProfile() {
   try {
     const snap = await getDoc(doc(db, 'settings', 'profile'));
@@ -99,10 +97,27 @@ if(profileForm) {
   };
 }
 
+// حل مشكلة تبديل التابين (إضافة تطبيق / تعديل ملفي)
 const showAppBtn = document.getElementById('show-app-form-btn');
 const showProfBtn = document.getElementById('show-profile-form-btn');
-if(showAppBtn) showAppBtn.onclick = () => { document.getElementById('app-form')?.classList.remove('hidden'); document.getElementById('profile-form')?.classList.add('hidden'); };
-if(showProfBtn) showProfBtn.onclick = () => { document.getElementById('app-form')?.classList.add('hidden'); document.getElementById('profile-form')?.classList.remove('hidden'); };
+
+if(showAppBtn) {
+  showAppBtn.onclick = () => {
+    document.getElementById('app-form')?.classList.remove('hidden');
+    document.getElementById('profile-form')?.classList.add('hidden');
+    showAppBtn.className = 'btn btn-dark small';
+    showProfBtn.className = 'btn btn-outline small';
+  };
+}
+
+if(showProfBtn) {
+  showProfBtn.onclick = () => {
+    document.getElementById('app-form')?.classList.add('hidden');
+    document.getElementById('profile-form')?.classList.remove('hidden');
+    showAppBtn.className = 'btn btn-outline small';
+    showProfBtn.className = 'btn btn-dark small';
+  };
+}
 
 let allApps = [];
 let currentApp = null;
@@ -146,7 +161,7 @@ function renderApps(filter = 'all', search = '') {
   });
 }
 
-// نظام اللايك (Toggle)
+// لايك
 window.handleQuickLike = async (e, appId) => {
   e.stopPropagation(); 
   const key = `liked_${appId}`;
@@ -259,17 +274,15 @@ if(detailLikeBtn) {
   };
 }
 
-// 2. نظام التقييم بالنجوم الحقيقي والتعليقات العامة المفتوحة للجميع
+// مراجعات وتقييم
 async function loadReviews(appId) {
   const rList = document.getElementById('reviews-list');
-  rList.innerHTML = '<small style="color:var(--muted)">جاري جلب الآراء الحقيقية والتقييمات...</small>';
-  
+  rList.innerHTML = '<small style="color:var(--muted)">جاري جلب الآراء...</small>';
   injectRatingSelector();
 
   try {
     const snap = await getDocs(query(collection(db, `apps/${appId}/reviews`), orderBy('createdAt', 'desc')));
     const revs = snap.docs.map(d => d.data());
-    
     let totalStars = 0;
     revs.forEach(r => totalStars += Number(r.rating || 5));
     const avgScore = revs.length ? (totalStars / revs.length).toFixed(1) : '5.0';
@@ -277,7 +290,7 @@ async function loadReviews(appId) {
     document.getElementById('reviews-count').textContent = `${revs.length} تقييم • ⭐ ${avgScore} من 5`;
 
     if (!revs.length) { 
-      rList.innerHTML = '<small style="color:var(--muted); display:block; padding:10px;">لا توجد تقييمات بعد. كن أول من يقيّم هذا التطبيق!</small>'; 
+      rList.innerHTML = '<small style="color:var(--muted); display:block; padding:10px;">لا توجد تقييمات بعد.</small>'; 
       return; 
     }
 
@@ -323,17 +336,13 @@ document.getElementById('add-review-form').onsubmit = async (e) => {
   const text = document.getElementById('review-user-text').value;
   const rating = Number(document.getElementById('review-user-rating')?.value || 5);
 
-  showToast('جاري نشر التقييم للعامة...');
-
+  showToast('جاري نشر التقييم...');
   await addDoc(collection(db, `apps/${currentApp.id}/reviews`), {
-    name: name,
-    text: text,
-    rating: rating,
-    createdAt: serverTimestamp()
+    name, text, rating, createdAt: serverTimestamp()
   });
 
   document.getElementById('add-review-form').reset();
-  showToast('تم نشر تقييمك ليراه الجميع بنجاح! ⭐');
+  showToast('تم نشر تقييمك بنجاح! ⭐');
   loadReviews(currentApp.id);
 };
 
@@ -358,7 +367,7 @@ if(verForm) verForm.onsubmit = async (e) => {
   const newNotes = document.getElementById('new-ver-notes').value;
 
   document.getElementById('version-modal')?.classList.add('hidden');
-  showToast('جاري رفع الإصدار وتحديث الصفحة...'); 
+  showToast('جاري رفع التحديث...'); 
 
   const appRef = doc(db, 'apps', id);
   const snap = await getDoc(appRef);
@@ -379,7 +388,7 @@ if(verForm) verForm.onsubmit = async (e) => {
   }
 };
 
-// أدمن: حذف وتعديل
+// حذف وتعديل
 const delAppBtn = document.getElementById('admin-delete-app-btn');
 if(delAppBtn) delAppBtn.onclick = async () => {
   if (confirm(`حذف "${currentApp.name}" نهائياً؟`)) {
@@ -442,16 +451,44 @@ if(appForm) appForm.onsubmit = async (e) => {
   fetchApps();
 };
 
+// خوارزمية ضغط ومعالجة الصور HD للحفاظ على جودة خرافية بدون بكسلة
 function fileToBase64(file) {
-  return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result);
-    r.onerror = e => rej(e);
-    r.readAsDataURL(file);
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 1200; // حجم عالي الدقة HD
+        const MAX_HEIGHT = 1200;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        // الحفاظ على 92% من جودة ونقاء الصورة الأصلية
+        resolve(canvas.toDataURL('image/jpeg', 0.92));
+      };
+    };
   });
 }
 
-// فلاتر البحث
+// فلاتر
 document.getElementById('search-input').oninput = e => renderApps(document.querySelector('.filter.active').dataset.category, e.target.value);
 document.querySelectorAll('.filter').forEach(btn => {
   btn.onclick = () => {
@@ -461,7 +498,7 @@ document.querySelectorAll('.filter').forEach(btn => {
   };
 });
 
-// المصادقة
+// المصادقة (إصلاح إخفاء خانة الاسم نهائياً عند تسجيل الدخول)
 let isLoginMode = true;
 function openAuthForm(mode) {
   isLoginMode = (mode === 'login');
@@ -477,7 +514,17 @@ function openAuthForm(mode) {
   const switchBtn = document.getElementById('auth-switch');
   if(switchBtn) switchBtn.textContent = isLoginMode ? 'حساب جديد' : 'تسجيل الدخول';
   
-  document.getElementById('name-field')?.classList.toggle('hidden', isLoginMode);
+  // إخفاء خانة الاسم يدوياً وبـ CSS
+  const nameField = document.getElementById('name-field');
+  if (nameField) {
+    if (isLoginMode) {
+      nameField.classList.add('hidden');
+      nameField.style.display = 'none';
+    } else {
+      nameField.classList.remove('hidden');
+      nameField.style.display = 'flex';
+    }
+  }
   
   const forgotBtn = document.getElementById('forgot-password');
   if(forgotBtn) {
@@ -576,7 +623,7 @@ logoutBtns.forEach(id => {
   if(btn) btn.onclick = async () => { await signOut(auth); showToast('تم تسجيل الخروج'); };
 });
 
-// 3. نظام إرسال رسائل التواصل الحقيقي لبريدك (بدون تعليق وبدون كابتشا)
+// إرسال الرسائل الحقيقي
 const formC = document.getElementById('contact-form');
 if(formC) {
   formC.onsubmit = async (e) => {
@@ -604,7 +651,7 @@ if(formC) {
           "بريد المرسل": email,
           "الرسالة": message,
           "_subject": "رسالة جديدة من منصة KEMO DEVELOPER!",
-          "_captcha": "false", // يمنع التعليق
+          "_captcha": "false",
           "_template": "table"
         })
       });
