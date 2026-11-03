@@ -3,36 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#171722">
-  
-  <!-- ================= أكواد SEO الأساسية لجوجل ================= -->
-  <title>Kemo Developer | منصة التطبيقات والألعاب</title>
+  <meta name="theme-color" content="#f7f7fb">
+  <title>KEMO DEVELOPER | منصة التطبيقات والألعاب</title>
   <meta name="description" content="منصة Kemo Developer الرسمية، أفضل مكان لاكتشاف وتحميل أحدث التطبيقات والألعاب والأدوات الرقمية بأمان وبدون إعلانات مزعجة.">
   <meta name="keywords" content="Kemo Developer, كيمو ديفلوبر, كريم عمار, تطبيقات أندرويد, ألعاب مجانية, تحميل برامج, مطور برمجيات, تطبيقات مهكرة">
   <meta name="author" content="كريم عمار (KEMO)">
   
-  <!-- أكواد الأيقونة اللي هتظهر جنب الاسم في جوجل -->
+  <!-- أيقونة الموقع والسوشيال لجوجل -->
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="apple-touch-icon" href="favicon.png">
-
-  <!-- أكواد المشاركة على السوشيال ميديا (Open Graph) -->
   <meta property="og:title" content="Kemo Developer | منصة التطبيقات والألعاب">
   <meta property="og:description" content="اكتشف أحدث الإصدارات، تصفّح مكتبتنا الرقمية، وحمّل تطبيقاتك المفضلة بسهولة من Kemo Developer.">
   <meta property="og:image" content="favicon.png">
   <meta property="og:url" content="https://kemo-alamy.github.io/Website_Kemo_Developer/">
   <meta property="og:type" content="website">
 
-  <!-- ================= ملفات الخطوط والتصميم ================= -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="site-shell">
     
-    <!-- الهيدر -->
     <header class="header" id="top">
       <a class="logo" href="#" onclick="location.reload()">
         <span class="logo-symbol">K</span><span>KEMO<span class="logo-accent">.</span>DEVELOPER</span>
@@ -140,7 +133,13 @@
 
       <section class="contact-section section-wrap section-block" id="contact">
         <div class="contact-copy reveal"><span class="eyebrow">تواصل معنا</span><h2>هل لديك <span class="gradient-text">استفسار؟</span></h2><p>يسعدنا استقبال رسائلك.</p></div>
-        <form class="contact-form reveal" id="contact-form"><label>الاسم<input id="contact-name" required></label><label>البريد<input id="contact-email" type="email" required></label><label>الرسالة<textarea id="contact-message" required rows="4"></textarea></label><button class="btn btn-dark" type="submit">إرسال <span>←</span></button><p id="contact-status" class="form-status"></p></form>
+        <form class="contact-form reveal" id="contact-form">
+          <label>الاسم<input id="contact-name" required></label>
+          <label>البريد<input id="contact-email" type="email" required></label>
+          <label>الرسالة<textarea id="contact-message" required rows="4"></textarea></label>
+          <button class="btn btn-dark" type="submit">إرسال <span>←</span></button>
+          <p id="contact-status" class="form-status"></p>
+        </form>
       </section>
     </main>
 
@@ -192,7 +191,7 @@
       </div>
     </section>
 
-    <!-- النوافذ المنبثقة -->
+    <!-- نافذة إضافة إصدار جديد -->
     <div id="version-modal" class="modal hidden">
       <div class="modal-card version-modal-card">
         <button class="modal-close" id="version-modal-close">×</button>
@@ -200,21 +199,21 @@
           <div class="v-icon">⬆️</div>
           <div><h2>إضافة تحديث جديد</h2><p id="version-app-title" class="modal-subtitle"></p></div>
         </div>
-        <form id="version-form" class="version-fancy-form">
+        <form id="version-form" class="admin-form">
           <input type="hidden" id="ver-app-id">
-          <div class="form-row">
-            <div class="input-group"><input id="new-ver-number" placeholder=" " required><label>رقم الإصدار</label></div>
-            <div class="input-group"><input id="new-ver-name" placeholder=" " required><label>اسم التطبيق</label></div>
+          <label>رقم الإصدار<input id="new-ver-number" placeholder="مثال: 2.1" required></label>
+          <label>اسم التطبيق<input id="new-ver-name" placeholder="الاسم في هذا الإصدار" required></label>
+          <label class="wide">أيقونة الإصدار الجديد (اختياري)<input id="new-ver-image" type="file" accept="image/*"></label>
+          <label class="wide">رابط التحميل<input id="new-ver-url" type="url" placeholder="رابط الملف" required></label>
+          <label class="wide">ما الجديد؟<textarea id="new-ver-notes" rows="3" required></textarea></label>
+          <div class="admin-form-actions wide">
+            <button class="btn btn-dark full-width" type="submit">نشر الإصدار الجديد</button>
           </div>
-          <div class="file-upload-group"><label>أيقونة الإصدار الجديد</label><input id="new-ver-image" type="file" accept="image/*"></div>
-          <div class="input-group"><input id="new-ver-url" type="url" placeholder=" " required><label>رابط التحميل</label></div>
-          <div class="input-group"><textarea id="new-ver-notes" rows="3" placeholder=" " required></textarea><label>ما الجديد؟</label></div>
-          <button class="btn btn-dark full-width" type="submit" style="margin-top:10px;">نشر الإصدار الجديد</button>
         </form>
       </div>
     </div>
 
-    <!-- لوحة الإدارة -->
+    <!-- لوحة الإدارة (تم إصلاح الهيكلة لتتناسب مع الـ CSS تماماً) -->
     <section id="admin-panel" class="admin-panel hidden section-wrap">
       <div class="admin-top">
         <div><span class="eyebrow">لوحة التحكم</span><h2>إدارة الموقع</h2></div>
@@ -223,6 +222,7 @@
           <button class="btn btn-outline small" id="show-profile-form-btn">تعديل ملفي</button>
         </div>
       </div>
+      
       <form id="app-form" class="admin-form">
         <input id="edit-id" type="hidden">
         <label>اسم التطبيق<input id="app-name" required maxlength="80"></label>
@@ -241,16 +241,18 @@
         <label>الاسم الظاهر<input id="edit-profile-name" required></label>
         <label>اللقب<input id="edit-profile-tag" required></label>
         <label class="wide">نبذة<textarea id="edit-profile-bio" rows="3" required></textarea></label>
-        <label>الصورة<input id="edit-profile-img" type="file" accept="image/*"></label>
+        <label class="wide">الصورة<input id="edit-profile-img" type="file" accept="image/*"></label>
         <label>فيسبوك<input id="edit-profile-fb" type="url"></label>
         <label>واتساب<input id="edit-profile-wa" type="url"></label>
         <label>انستجرام<input id="edit-profile-ig" type="url"></label>
         <label>جيت هاب<input id="edit-profile-gh" type="url"></label>
-        <div class="admin-form-actions wide"><button class="btn btn-dark" type="submit">حفظ الملف</button></div>
+        <div class="admin-form-actions wide">
+          <button class="btn btn-dark full-width" type="submit">حفظ الملف</button>
+        </div>
       </form>
     </section>
 
-    <!-- تسجيل الدخول العائم -->
+    <!-- تسجيل الدخول -->
     <div id="auth-modal" class="modal hidden">
       <div class="modal-card modern-auth-card">
         <button class="modal-close" id="auth-close">×</button>
@@ -258,7 +260,7 @@
           <div class="auth-logo">K.</div>
           <h2 id="auth-title">تسجيل الدخول</h2>
         </div>
-        <form id="auth-form" class="modern-auth-form">
+        <form id="auth-form" class="modern-auth-form" style="text-align: right;">
           <div class="input-group hidden" id="name-field"><input id="display-name" autocomplete="name" placeholder=" "><label>الاسم الكريم</label></div>
           <div class="input-group"><input id="auth-email" type="email" autocomplete="email" placeholder=" " required><label>البريد الإلكتروني</label></div>
           <div class="input-group" id="pass-field"><input id="auth-password" type="password" minlength="6" placeholder=" " required><label>كلمة المرور</label></div>
