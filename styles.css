@@ -58,7 +58,7 @@ button, input, textarea, select { font: inherit; outline: none; }
 .menu-toggle { display: none; background: none; border: none; cursor: pointer; gap: 5px; flex-direction: column; padding: 5px; }
 .menu-toggle span { width: 24px; height: 3px; background: var(--ink); border-radius: 2px; }
 
-/* ================= الهيرو والكروت ================= */
+/* ================= الهيرو ================= */
 .hero { min-height: 85vh; display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 40px; padding-top: 40px; padding-bottom: 40px; }
 .availability { display: inline-flex; align-items: center; gap: 9px; background: var(--surface); border: 1px solid var(--line); padding: 7px 14px; border-radius: 30px; font-size: 11px; color: var(--muted); font-weight: 700; margin-bottom: 15px;}
 .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 0 4px rgba(16,185,129,0.2); }
@@ -102,9 +102,9 @@ button, input, textarea, select { font: inherit; outline: none; }
 .dev-social-icon { width: 45px; height: 45px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); display: grid; place-items: center; color: var(--muted); transition: 0.3s; }
 .dev-social-icon svg { width: 22px; height: 22px; fill: currentColor; }
 .dev-social-icon:hover { transform: translateY(-4px); }
-.dev-social-icon.fb:hover { color: #1877f2; border-color: #1877f2; box-shadow: 0 5px 15px rgba(24,119,242,0.2); }
-.dev-social-icon.wa:hover { color: #25d366; border-color: #25d366; box-shadow: 0 5px 15px rgba(37,211,102,0.2); }
-.dev-social-icon.ig:hover { color: #e1306c; border-color: #e1306c; box-shadow: 0 5px 15px rgba(225,48,108,0.2); }
+.dev-social-icon.fb:hover { color: #1877f2; border-color: #1877f2; }
+.dev-social-icon.wa:hover { color: #25d366; border-color: #25d366; }
+.dev-social-icon.ig:hover { color: #e1306c; border-color: #e1306c; }
 .dev-social-icon.gh:hover { color: var(--ink); border-color: var(--ink); }
 
 /* ================= التطبيقات ================= */
@@ -123,7 +123,7 @@ button, input, textarea, select { font: inherit; outline: none; }
 .app-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; display: flex; flex-direction: column; box-shadow: 0 5px 20px rgba(0,0,0,0.02);}
 .app-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); border-color: var(--accent); }
 .app-cover { height: 180px; background: var(--bg); position: relative; overflow: hidden; border-bottom: 1px solid var(--line); }
-.app-cover img { width: 100%; height: 100%; object-fit: cover; }
+.app-cover img { width: 100%; height: 100%; object-fit: cover; image-rendering: -webkit-optimize-contrast; }
 .app-tag { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.9); color: var(--accent); border-radius: 20px; padding: 4px 12px; font-size: 10px; font-weight: 800; }
 .app-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
 .app-title-line { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px;}
@@ -134,7 +134,7 @@ button, input, textarea, select { font: inherit; outline: none; }
 .quick-like-btn { background: var(--bg); color: #ff4d6d; border: 1px solid var(--line); padding: 6px 14px; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: 800; transition: 0.2s; z-index: 5; }
 .quick-like-btn.liked, .quick-like-btn:hover { background: #ff4d6d; color: #fff; }
 
-/* ================= الأقسام الأخرى ================= */
+/* ================= أقسام أخرى ================= */
 .feature-band { background: var(--soft); border-radius: 24px; padding: 50px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; margin-bottom: 40px; }
 .feature-copy h2 { font-size: clamp(28px, 4vw, 40px); margin: 0 0 15px; font-weight: 900; }
 .feature-copy p { font-size: 14px; color: var(--muted); line-height: 1.8; margin-bottom: 25px; }
@@ -162,7 +162,7 @@ button, input, textarea, select { font: inherit; outline: none; }
 .back-btn { background: none; border: none; color: var(--accent); font-weight: 900; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 5px;}
 .app-tag-pill { background: var(--soft); color: var(--accent); padding: 6px 15px; border-radius: 20px; font-size: 12px; font-weight: 800; }
 .fullpage-hero { display: flex; gap: 25px; align-items: center; margin-bottom: 35px; flex-wrap: wrap;}
-.app-display-cover img { width: 120px; height: 120px; border-radius: 20px; object-fit: cover; box-shadow: var(--shadow); }
+.app-display-cover img { width: 120px; height: 120px; border-radius: 20px; object-fit: cover; box-shadow: var(--shadow); image-rendering: -webkit-optimize-contrast; }
 .app-display-meta h1 { font-size: clamp(24px, 4vw, 32px); margin: 0 0 8px; font-weight: 900;}
 .active-version-indicator { font-size: 13px; color: var(--accent); font-weight: 800; margin-bottom: 18px; }
 .action-buttons-group { display: flex; gap: 12px; align-items: center; flex-wrap: wrap;}
@@ -190,11 +190,16 @@ button, input, textarea, select { font: inherit; outline: none; }
 .modal-admin-actions { border-top: 1px dashed var(--line); padding-top: 20px; margin-top: 30px;}
 .admin-inline-btns { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap;}
 
-/* ================= لوحة التحكم (تم تحصينها بقواعد إجبارية قاطعة) ================= */
+/* ================= لوحة التحكم ================= */
 .admin-panel { background: var(--surface); border: 1px solid var(--accent); border-radius: 20px; padding: 30px; margin: 40px auto; box-shadow: var(--shadow); }
 .admin-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
 
-/* إجبار الفورم على شبكة عمودين للتابلت والكمبيوتر */
+/* إجبار إخفاء الفورم المخفية لمنع ظهور التابين مع بعض */
+form.admin-form.hidden,
+#admin-panel form.hidden {
+  display: none !important;
+}
+
 form.admin-form,
 #admin-panel form {
   display: grid !important;
@@ -253,7 +258,7 @@ form.admin-form textarea,
   flex: 1 !important;
 }
 
-/* ================= نافذة تسجيل الدخول (تم تحصينها ضد أي انهيار) ================= */
+/* ================= نافذة تسجيل الدخول ================= */
 .modal { position: fixed; inset: 0; background: rgba(5,7,15,0.85); backdrop-filter: blur(10px); z-index: 10000; display: grid; place-items: center; padding: 15px; }
 .modal-card { width: min(420px, 92%) !important; background: var(--surface) !important; border: 1px solid var(--line) !important; border-radius: 20px !important; padding: 35px !important; position: relative; box-shadow: var(--shadow); max-height: 95vh; overflow-y: auto; text-align: center !important; }
 .modal-close { position: absolute; left: 20px; top: 15px; font-size: 28px; background: none; border: none; color: var(--muted); cursor: pointer; z-index: 10;}
@@ -261,7 +266,6 @@ form.admin-form textarea,
 .auth-header { text-align: center; margin-bottom: 20px; }
 .auth-logo { width: 55px; height: 55px; margin: 0 auto 15px; background: var(--accent); color: #fff; border-radius: 16px; display: grid; place-items: center; font-size: 26px; font-weight: 900; }
 
-/* إجبار فورم الدخول تترتب عمودياً */
 form.auth-solid-form,
 #auth-modal form {
   display: flex !important;
@@ -270,6 +274,11 @@ form.auth-solid-form,
   width: 100% !important;
   margin-top: 20px !important;
   text-align: right !important;
+}
+
+/* إخفاء حقل الاسم إجبارياً لو معاه كلاس hidden */
+#auth-modal #name-field.hidden {
+  display: none !important;
 }
 
 form.auth-solid-form label,
@@ -350,7 +359,7 @@ form.auth-solid-form input:focus,
 .reveal { animation: fadeInUp 0.8s ease forwards; }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-/* ================= التوافق مع الشاشات (Responsive) ================= */
+/* ================= التوافق مع الشاشات ================= */
 @media (max-width: 992px) {
   .desktop-actions { display: none !important; }
   .mobile-header-tools { display: flex !important; margin-right: auto; }
@@ -384,7 +393,6 @@ form.auth-solid-form input:focus,
   .fullpage-hero { flex-direction: column; text-align: center; }
   .action-buttons-group { justify-content: center; }
   
-  /* في الموبايل نخلي لوحة الأدمن عمودية تحت بعضها */
   form.admin-form,
   #admin-panel form {
     grid-template-columns: 1fr !important;
