@@ -6,10 +6,9 @@
   <meta name="theme-color" content="#f7f7fb">
   <title>KEMO DEVELOPER | منصة التطبيقات والألعاب</title>
   <meta name="description" content="منصة Kemo Developer الرسمية، أفضل مكان لاكتشاف وتحميل أحدث التطبيقات والألعاب والأدوات الرقمية بأمان وبدون إعلانات مزعجة.">
-  <meta name="keywords" content="Kemo Developer, كيمو ديفلوبر, كريم عمار, تطبيقات أندرويد, ألعاب مجانية, تحميل برامج, مطور برمجيات, تطبيقات مهكرة">
+  <meta name="keywords" content="Kemo Developer, كيمو ديفلوبر, كريم عمار, تطبيقات أندرويد, ألعاب مجانية, تحميل برامج, مطور برمجيات">
   <meta name="author" content="كريم عمار (KEMO)">
   
-  <!-- أيقونة الموقع والسوشيال لجوجل -->
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="apple-touch-icon" href="favicon.png">
   <meta property="og:title" content="Kemo Developer | منصة التطبيقات والألعاب">
@@ -133,17 +132,11 @@
 
       <section class="contact-section section-wrap section-block" id="contact">
         <div class="contact-copy reveal"><span class="eyebrow">تواصل معنا</span><h2>هل لديك <span class="gradient-text">استفسار؟</span></h2><p>يسعدنا استقبال رسائلك.</p></div>
-        <form class="contact-form reveal" id="contact-form">
-          <label>الاسم<input id="contact-name" required></label>
-          <label>البريد<input id="contact-email" type="email" required></label>
-          <label>الرسالة<textarea id="contact-message" required rows="4"></textarea></label>
-          <button class="btn btn-dark" type="submit">إرسال <span>←</span></button>
-          <p id="contact-status" class="form-status"></p>
-        </form>
+        <form class="contact-form reveal" id="contact-form"><label>الاسم<input id="contact-name" required></label><label>البريد<input id="contact-email" type="email" required></label><label>الرسالة<textarea id="contact-message" required rows="4"></textarea></label><button class="btn btn-dark" type="submit">إرسال <span>←</span></button><p id="contact-status" class="form-status"></p></form>
       </section>
     </main>
 
-    <!-- صفحة تفاصيل التطبيق -->
+    <!-- صفحة تفاصيل التطبيق الكاملة -->
     <section id="app-details-view" class="fullpage-view hidden">
       <div class="fullpage-container section-wrap">
         <div class="fullpage-topbar">
@@ -213,7 +206,7 @@
       </div>
     </div>
 
-    <!-- لوحة الإدارة (تم إصلاح الهيكلة لتتناسب مع الـ CSS تماماً) -->
+    <!-- لوحة الإدارة -->
     <section id="admin-panel" class="admin-panel hidden section-wrap">
       <div class="admin-top">
         <div><span class="eyebrow">لوحة التحكم</span><h2>إدارة الموقع</h2></div>
@@ -252,22 +245,25 @@
       </form>
     </section>
 
-    <!-- تسجيل الدخول -->
+    <!-- نافذة تسجيل الدخول البسيطة والصلبة (مستحيل تبوظ) -->
     <div id="auth-modal" class="modal hidden">
-      <div class="modal-card modern-auth-card">
+      <div class="modal-card">
         <button class="modal-close" id="auth-close">×</button>
         <div class="auth-header">
           <div class="auth-logo">K.</div>
           <h2 id="auth-title">تسجيل الدخول</h2>
         </div>
-        <form id="auth-form" class="modern-auth-form" style="text-align: right;">
-          <div class="input-group hidden" id="name-field"><input id="display-name" autocomplete="name" placeholder=" "><label>الاسم الكريم</label></div>
-          <div class="input-group"><input id="auth-email" type="email" autocomplete="email" placeholder=" " required><label>البريد الإلكتروني</label></div>
-          <div class="input-group" id="pass-field"><input id="auth-password" type="password" minlength="6" placeholder=" " required><label>كلمة المرور</label></div>
-          <button class="btn btn-dark full-width auth-btn" id="auth-submit">دخول</button>
+        <form id="auth-form" class="auth-solid-form">
+          <label id="name-field" class="hidden">الاسم الكريم<input id="display-name" autocomplete="name" placeholder="اسمك"></label>
+          <label>البريد الإلكتروني<input id="auth-email" type="email" autocomplete="email" required placeholder="name@example.com"></label>
+          <label id="pass-field">كلمة المرور<input id="auth-password" type="password" minlength="6" required placeholder="••••••••"></label>
+          <button class="btn btn-dark full-width auth-submit-btn" id="auth-submit">دخول</button>
         </form>
         <button class="text-action" id="forgot-password">نسيت كلمة المرور؟</button>
-        <div class="auth-footer"><span id="switch-label">ليس لديك حساب؟</span><button id="auth-switch">حساب جديد</button></div>
+        <div class="auth-footer">
+          <span id="switch-label">ليس لديك حساب؟</span>
+          <button id="auth-switch">إنشاء حساب جديد</button>
+        </div>
       </div>
     </div>
     
