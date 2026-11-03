@@ -194,7 +194,6 @@ button, input, textarea, select { font: inherit; outline: none; }
 .admin-panel { background: var(--surface); border: 1px solid var(--accent); border-radius: 20px; padding: 30px; margin: 40px auto; box-shadow: var(--shadow); }
 .admin-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
 
-/* إجبار إخفاء الفورم المخفية لمنع ظهور التابين مع بعض */
 form.admin-form.hidden,
 #admin-panel form.hidden {
   display: none !important;
@@ -276,7 +275,6 @@ form.auth-solid-form,
   text-align: right !important;
 }
 
-/* إخفاء حقل الاسم إجبارياً لو معاه كلاس hidden */
 #auth-modal #name-field.hidden {
   display: none !important;
 }
@@ -371,14 +369,20 @@ form.auth-solid-form input:focus,
 }
 
 @media (max-width: 768px) {
+  /* 1. ضبط شريط الهيدر بالمسافات السليمة في الموبايل */
+  .header { padding: 0 15px !important; justify-content: space-between !important; }
+  .logo { order: 1 !important; margin: 0 !important; }
+  .mobile-header-tools { display: flex !important; order: 2 !important; margin: 0 !important; gap: 10px !important; }
+
   .hero { grid-template-columns: 1fr; text-align: center; gap: 20px; padding-top: 20px;}
   .hero-lead { margin-inline: auto; }
   .hero-buttons, .hero-meta { justify-content: center; }
   
-  .hero-visual { min-height: auto; margin-top: 80px; }
-  .app-window { width: 220px; height: 250px; margin: 0 auto; }
-  .card-top { top: -10px; right: 2%; }
-  .card-bottom { bottom: -10px; left: 2%; }
+  /* 2. تنزيل الكارت السفلي ليصبح بعيداً عن الكلام الإنجليزي تماماً */
+  .hero-visual { min-height: auto; margin-top: 60px; padding-bottom: 55px !important; }
+  .app-window { width: 220px; height: 260px; margin: 0 auto; }
+  .card-top { top: -15px !important; right: 0% !important; }
+  .card-bottom { bottom: -45px !important; left: -10px !important; }
   
   .developer-hero-card { grid-template-columns: 1fr; text-align: center; padding: 25px 15px;}
   .dev-social-dock { justify-content: center; }
