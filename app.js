@@ -312,38 +312,86 @@ async function loadReviews(appId) {
   }
 }
 
+let selectedRating = 5;
+
 function injectRatingSelector() {
   const form = document.getElementById('add-review-form');
-  if (form && !document.getElementById('review-user-rating')) {
-    const select = document.createElement('select');
-    select.id = 'review-user-rating';
-    select.style.cssText = 'background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:12px; color:var(--ink); font-size:13px; font-weight:700; width:100%; margin-bottom:10px;';
-    select.innerHTML = `
-      <option value="5">⭐⭐⭐⭐⭐ (ممتاز 5/5)</option>
-      <option value="4">⭐⭐⭐⭐ (جيد جداً 4/5)</option>
-      <option value="3">⭐⭐⭐ (متوسط 3/5)</option>
-      <option value="2">⭐⭐ (ضعيف 2/5)</option>
-      <option value="1">⭐ (سيء 1/5)</option>
-    `;
-    const btn = form.querySelector('button[type="submit"]');
-    form.insertBefore(select, btn);
+  if (!form || document.getElementById('review-user-rating')) return;
+
+  selectedRating = 5;
+
+  const hidden = document.createElement('input');
+  hidden.type = 'hidden';
+  hidden.id = 'review-user-rating';
+  hidden.value = '5';
+
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'display:flex; align-items:center; margin-bottom:4px;';
+
+  const starsBox = document.createElement('div');
+  starsBox.className = 'star-rating-input';
+
+  for (let i = 1; i <= 5; i++) {
+    const star = document.createElement('span');
+    star.className = 'star';
+    star.dataset.value = i;
+    star.textContent = '★';
+    star.onclick = () => {
+      selectedRating = i;
+      hidden.value = i;
+      paintStars(starsBox, i);
+    };
+    star.onmouseenter = () => paintStars(starsBox, i);
+    starsBox.appendChild(star);
   }
+  starsBox.onmouseleave = () => paintStars(starsBox, selectedRating);
+
+  const label = document.createElement('span');
+  label.className = 'star-rating-label';
+  label.textContent = 'تقييمك';
+
+  wrap.appendChild(starsBox);
+  wrap.appendChild(label);
+
+  const btn = form.querySelector('button[type="submit"]');
+  form.insertBefore(hidden, btn);
+  form.insertBefore(wrap, btn);
+  paintStars(starsBox, selectedRating);
+}
+
+function paintStars(container, count) {
+  container.querySelectorAll('.star').forEach(s => {
+    s.classList.toggle('filled', Number(s.dataset.value) <= count);
+  });
 }
 
 document.getElementById('add-review-form').onsubmit = async (e) => {
   e.preventDefault();
-  const name = document.getElementById('review-user-name').value;
-  const text = document.getElementById('review-user-text').value;
-  const rating = Number(document.getElementById('review-user-rating')?.value || 5);
+  const name = document.getElementById('review-user-name').value.trim();
+  const text = document.getElementById('review-user-text').value.trim();
+  const rating = Number(document.getElementById('review-user-rating')?.value || selectedRating || 5);
+  const submitBtn = e.target.querySelector('button[type="submit"]');
 
+  if (!name || !text) { showToast('اكتب اسمك ورأيك الأول'); return; }
+
+  submitBtn.disabled = true;
   showToast('جاري نشر التقييم...');
-  await addDoc(collection(db, `apps/${currentApp.id}/reviews`), {
-    name, text, rating, createdAt: serverTimestamp()
-  });
-
-  document.getElementById('add-review-form').reset();
-  showToast('تم نشر تقييمك بنجاح! ⭐');
-  loadReviews(currentApp.id);
+  try {
+    await addDoc(collection(db, `apps/${currentApp.id}/reviews`), {
+      name, text, rating, createdAt: serverTimestamp()
+    });
+    document.getElementById('add-review-form').reset();
+    document.getElementById('review-user-rating')?.remove();
+    selectedRating = 5;
+    injectRatingSelector();
+    showToast('تم نشر تقييمك بنجاح! ⭐');
+    loadReviews(currentApp.id);
+  } catch (err) {
+    console.error(err);
+    showToast('تعذّر نشر التقييم، حاول تاني لاحقاً');
+  } finally {
+    submitBtn.disabled = false;
+  }
 };
 
 // أدمن: إصدار جديد
