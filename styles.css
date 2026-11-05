@@ -120,11 +120,13 @@ button, input, textarea, select { font: inherit; outline: none; }
 .filter.active, .filter:hover { background: var(--ink); color: white; border-color: var(--ink); }
 
 .apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-.app-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; display: flex; flex-direction: column; box-shadow: 0 5px 20px rgba(0,0,0,0.02);}
-.app-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); border-color: var(--accent); }
-.app-cover { height: 180px; background: var(--bg); position: relative; overflow: hidden; border-bottom: 1px solid var(--line); }
-.app-cover img { width: 100%; height: 100%; object-fit: cover; image-rendering: -webkit-optimize-contrast; }
-.app-tag { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.9); color: var(--accent); border-radius: 20px; padding: 4px 12px; font-size: 10px; font-weight: 800; }
+.app-card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s; cursor: pointer; display: flex; flex-direction: column; box-shadow: 0 5px 20px rgba(0,0,0,0.02);}
+.app-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); border-color: var(--accent); }
+.app-cover { aspect-ratio: 1 / 1; width: 100%; background: linear-gradient(145deg, var(--bg), var(--soft)); position: relative; overflow: hidden; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: center; }
+.app-cover img { width: 100%; height: 100%; object-fit: cover; image-rendering: -webkit-optimize-contrast; transition: transform 0.4s; }
+.app-card:hover .app-cover img { transform: scale(1.06); }
+.cover-placeholder { font-size: 42px; color: var(--accent); opacity: 0.5; }
+.app-tag { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.92); backdrop-filter: blur(4px); color: var(--accent); border-radius: 20px; padding: 5px 13px; font-size: 10px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 .app-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
 .app-title-line { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px;}
 .app-title-line h3 { font-size: 16px; margin: 0; font-weight: 800;}
@@ -162,7 +164,8 @@ button, input, textarea, select { font: inherit; outline: none; }
 .back-btn { background: none; border: none; color: var(--accent); font-weight: 900; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 5px;}
 .app-tag-pill { background: var(--soft); color: var(--accent); padding: 6px 15px; border-radius: 20px; font-size: 12px; font-weight: 800; }
 .fullpage-hero { display: flex; gap: 25px; align-items: center; margin-bottom: 35px; flex-wrap: wrap;}
-.app-display-cover img { width: 120px; height: 120px; border-radius: 20px; object-fit: cover; box-shadow: var(--shadow); image-rendering: -webkit-optimize-contrast; }
+.app-display-cover { padding: 6px; border-radius: 28px; background: linear-gradient(145deg, var(--bg), var(--soft)); border: 1px solid var(--line); display: inline-flex; }
+.app-display-cover img { width: 110px; height: 110px; border-radius: 22px; object-fit: cover; box-shadow: var(--shadow); image-rendering: -webkit-optimize-contrast; display: block; }
 .app-display-meta h1 { font-size: clamp(24px, 4vw, 32px); margin: 0 0 8px; font-weight: 900;}
 .active-version-indicator { font-size: 13px; color: var(--accent); font-weight: 800; margin-bottom: 18px; }
 .action-buttons-group { display: flex; gap: 12px; align-items: center; flex-wrap: wrap;}
@@ -186,6 +189,13 @@ button, input, textarea, select { font: inherit; outline: none; }
 .review-compose-form { display: flex; flex-direction: column; gap: 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 16px; padding: 25px; margin-top: 20px; }
 .review-compose-form input, .review-compose-form textarea { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; color: var(--ink); font-size: 13px; font-family: inherit;}
 .review-compose-form textarea { resize: vertical; min-height: 80px; }
+
+/* تقييم بالنجوم التفاعلي */
+.star-rating-input { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 4px; direction: ltr; }
+.star-rating-input .star { font-size: 28px; line-height: 1; cursor: pointer; color: var(--line); transition: color 0.15s, transform 0.15s; user-select: none; }
+.star-rating-input .star.filled { color: #f5b301; }
+.star-rating-input .star:hover { transform: scale(1.15); }
+.star-rating-label { font-size: 12px; font-weight: 700; color: var(--muted); margin-right: 8px; }
 
 .modal-admin-actions { border-top: 1px dashed var(--line); padding-top: 20px; margin-top: 30px;}
 .admin-inline-btns { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap;}
