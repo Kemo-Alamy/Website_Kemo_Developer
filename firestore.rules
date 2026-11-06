@@ -35,8 +35,7 @@ service cloud.firestore {
       allow create: if isAdmin()
         && request.resource.data.name is string
         && request.resource.data.name.size() > 0
-        && request.resource.data.description is string
-        && request.resource.data.description.size() <= 500;
+        && request.resource.data.description is string;
       allow update: if isAdmin()
         && request.resource.data.name is string
         && request.resource.data.description is string;
