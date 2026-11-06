@@ -214,7 +214,6 @@ function openAppView(app) {
   buildVersions(app);
   
   applyAdminUI();
-  loadReviews(app.id);
 }
 
 document.getElementById('app-details-back').onclick = () => {
@@ -246,15 +245,38 @@ function buildVersions(app) {
   vList.appendChild(mainVer);
 
   if (app.history) {
-    app.history.forEach(h => {
+    app.history.forEach((h, idx) => {
       const oldVer = document.createElement('div');
       oldVer.className = 'version-card-selectable dimmed';
-      oldVer.innerHTML = `<div><b>v${h.version}</b> <small style="color:var(--muted)">(سابق)</small><br><small style="color:var(--muted)">${h.releaseNotes || 'تحديثات سابقة'}</small></div><span>تصفح ↗</span>`;
-      oldVer.onclick = () => { 
+      oldVer.innerHTML = `
+        <div class="version-row-text"><b>v${h.version}</b> <small style="color:var(--muted)">(سابق)</small><br><small style="color:var(--muted)">${h.releaseNotes || 'تحديثات سابقة'}</small></div>
+        <div class="version-row-actions">
+          <span>تصفح ↗</span>
+          ${isAdmin ? `<button type="button" class="version-delete-btn" title="حذف هذا الإصدار">🗑</button>` : ''}
+        </div>`;
+      oldVer.onclick = (e) => {
+        if (e.target.closest('.version-delete-btn')) return;
         document.querySelectorAll('.version-card-selectable').forEach(c => { c.classList.remove('active-version'); c.classList.add('dimmed'); }); 
         oldVer.classList.add('active-version'); oldVer.classList.remove('dimmed'); 
         setActiveVersionUI(h, false, app.coverUrl); 
       };
+      const delBtn = oldVer.querySelector('.version-delete-btn');
+      if (delBtn) {
+        delBtn.onclick = async (e) => {
+          e.stopPropagation();
+          if (!confirm(`حذف الإصدار v${h.version} نهائيًا؟`)) return;
+          try {
+            const newHistory = app.history.filter((_, i) => i !== idx);
+            await updateDoc(doc(db, 'apps', app.id), { history: newHistory });
+            app.history = newHistory;
+            showToast('تم حذف الإصدار');
+            buildVersions(app);
+          } catch (err) {
+            console.error(err);
+            showToast('تعذّر حذف الإصدار، حاول تاني');
+          }
+        };
+      }
       vList.appendChild(oldVer);
     });
   }
@@ -291,7 +313,7 @@ async function loadReviews(appId) {
 
   try {
     const snap = await getDocs(query(collection(db, `apps/${appId}/reviews`), orderBy('createdAt', 'desc')));
-    const revs = snap.docs.map(d => d.data());
+    const revs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     let totalStars = 0;
     revs.forEach(r => totalStars += Number(r.rating || 5));
     const avgScore = revs.length ? (totalStars / revs.length).toFixed(1) : '5.0';
@@ -306,16 +328,36 @@ async function loadReviews(appId) {
     rList.innerHTML = '';
     revs.forEach(r => { 
       const starsDisplay = '⭐'.repeat(r.rating || 5);
+      const delBtnHtml = isAdmin ? `<button type="button" class="review-delete-btn" data-id="${r.id}" title="حذف التقييم">🗑</button>` : '';
       rList.innerHTML += `
         <div class="review-item">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
             <b>${r.name}</b>
-            <span style="font-size:12px;">${starsDisplay}</span>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:12px;">${starsDisplay}</span>
+              ${delBtnHtml}
+            </div>
           </div>
           <p>${r.text}</p>
         </div>
       `; 
     });
+
+    if (isAdmin) {
+      rList.querySelectorAll('.review-delete-btn').forEach(btn => {
+        btn.onclick = async () => {
+          if (!confirm('حذف هذا التقييم نهائيًا؟')) return;
+          try {
+            await deleteDoc(doc(db, `apps/${appId}/reviews/${btn.dataset.id}`));
+            showToast('تم حذف التقييم');
+            loadReviews(appId);
+          } catch (err) {
+            console.error(err);
+            showToast('تعذّر حذف التقييم، حاول تاني');
+          }
+        };
+      });
+    }
   } catch(e) {
     rList.innerHTML = '<small style="color:var(--muted)">لا يمكن جلب التقييمات حالياً.</small>';
   }
@@ -659,6 +701,7 @@ function applyAdminUI() {
   if (panel) panel.classList.toggle('hidden', !isAdmin);
   if (currentApp) {
     document.getElementById('detail-admin-actions')?.classList.toggle('hidden', !isAdmin);
+    loadReviews(currentApp.id);
   }
 }
 
@@ -735,14 +778,15 @@ if(formC) {
         statusEl.style.color = '#10b981';
         formC.reset();
       } else {
-        statusEl.textContent = 'تم إرسال طلبك، تحقق من بريدك الإلكتروني!';
-        statusEl.style.color = '#10b981';
-        formC.reset();
+        const errText = await res.text().catch(() => '');
+        console.error('Contact form failed', res.status, errText);
+        statusEl.textContent = 'تعذّر إرسال الرسالة، حاول تاني بعد شوية';
+        statusEl.style.color = '#ef4444';
       }
     } catch (err) {
-      statusEl.textContent = 'تم إرسال طلبك بنجاح! ✓';
-      statusEl.style.color = '#10b981';
-      formC.reset();
+      console.error(err);
+      statusEl.textContent = 'تعذّر إرسال الرسالة، تأكد من اتصالك بالإنترنت وحاول تاني';
+      statusEl.style.color = '#ef4444';
     } finally {
       submitBtn.disabled = false;
       setTimeout(() => statusEl.textContent = '', 6000);
