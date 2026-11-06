@@ -190,7 +190,7 @@
         <button class="modal-close" id="version-modal-close">×</button>
         <div class="version-modal-header">
           <div class="v-icon">⬆️</div>
-          <div><h2>إضافة تحديث جديد</h2><p id="version-app-title" class="modal-subtitle"></p></div>
+          <div><h2 id="version-modal-title">إضافة تحديث جديد</h2><p id="version-app-title" class="modal-subtitle"></p></div>
         </div>
         <form id="version-form" class="admin-form">
           <input type="hidden" id="ver-app-id">
@@ -200,7 +200,7 @@
           <label class="wide">رابط التحميل<input id="new-ver-url" type="url" placeholder="رابط الملف" required></label>
           <label class="wide">ما الجديد؟<textarea id="new-ver-notes" rows="3" required></textarea></label>
           <div class="admin-form-actions wide">
-            <button class="btn btn-dark full-width" type="submit">نشر الإصدار الجديد</button>
+            <button class="btn btn-dark full-width" type="submit" id="version-submit-btn">نشر الإصدار الجديد</button>
           </div>
         </form>
       </div>
