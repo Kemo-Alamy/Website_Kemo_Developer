@@ -180,6 +180,9 @@ button, input, textarea, select { font: inherit; outline: none; }
 .version-card-selectable.active-version { border-color: var(--accent); background: var(--soft); transform: scale(1.02); }
 .version-card-selectable.dimmed { opacity: 0.6; }
 .version-card-selectable:hover { opacity: 1; }
+.version-row-actions { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.version-delete-btn, .review-delete-btn { background: transparent; border: 1px solid var(--line); color: #ff4d6d; width: 28px; height: 28px; border-radius: 8px; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; transition: 0.2s; }
+.version-delete-btn:hover, .review-delete-btn:hover { background: #ff4d6d; color: #fff; border-color: #ff4d6d; }
 
 .reviews-section-full { border-top: 1px solid var(--line); padding-top: 35px; margin-bottom: 30px; }
 .reviews-feed { display: grid; gap: 15px; max-height: 300px; overflow-y: auto; margin: 20px 0; padding-right: 5px; }
