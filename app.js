@@ -89,11 +89,20 @@ if(profileForm) {
       ig: document.getElementById('edit-profile-ig').value,
       gh: document.getElementById('edit-profile-gh').value,
     };
-    const imgF = document.getElementById('edit-profile-img').files[0];
-    if (imgF) d.img = await fileToBase64(imgF);
-    await setDoc(doc(db, 'settings', 'profile'), d, { merge: true });
-    showToast('تم حفظ الملف الشخصي بنجاح!');
-    loadProfile();
+    const submitBtn = profileForm.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    try {
+      const imgF = document.getElementById('edit-profile-img').files[0];
+      if (imgF) d.img = await fileToBase64(imgF);
+      await setDoc(doc(db, 'settings', 'profile'), d, { merge: true });
+      showToast('تم حفظ الملف الشخصي بنجاح!');
+      loadProfile();
+    } catch (err) {
+      console.error(err);
+      showToast('تعذّر حفظ الملف الشخصي، حاول تاني');
+    } finally {
+      submitBtn.disabled = false;
+    }
   };
 }
 
@@ -204,7 +213,7 @@ function openAppView(app) {
   setActiveVersionUI({ version: app.version, name: app.name, coverUrl: app.coverUrl, description: app.description, fileUrl: app.fileUrl, releaseNotes: app.releaseNotes }, true, app.coverUrl); 
   buildVersions(app);
   
-  document.getElementById('detail-admin-actions')?.classList.toggle('hidden', !isAdmin);
+  applyAdminUI();
   loadReviews(app.id);
 }
 
@@ -415,24 +424,29 @@ if(verForm) verForm.onsubmit = async (e) => {
   const newNotes = document.getElementById('new-ver-notes').value;
 
   document.getElementById('version-modal')?.classList.add('hidden');
-  showToast('جاري رفع التحديث...'); 
+  showToast('جاري رفع التحديث...');
 
-  const appRef = doc(db, 'apps', id);
-  const snap = await getDoc(appRef);
-  if (snap.exists()) {
-    const d = snap.data();
-    const history = d.history || [];
-    history.unshift({ version: d.version, name: d.name, coverUrl: d.coverUrl, fileUrl: d.fileUrl, releaseNotes: d.releaseNotes || d.description });
-    let updatedData = { version: newVer, name: newName, fileUrl: newUrl, releaseNotes: newNotes, history, updatedAt: serverTimestamp() };
-    
-    const imgF = document.getElementById('new-ver-image').files[0];
-    if(imgF) updatedData.coverUrl = await fileToBase64(imgF);
-    
-    await updateDoc(appRef, updatedData);
-    verForm.reset();
-    showToast('تمت إضافة التحديث بنجاح!');
-    document.getElementById('app-details-back')?.click();
-    fetchApps();
+  try {
+    const appRef = doc(db, 'apps', id);
+    const snap = await getDoc(appRef);
+    if (snap.exists()) {
+      const d = snap.data();
+      const history = d.history || [];
+      history.unshift({ version: d.version, name: d.name, coverUrl: d.coverUrl, fileUrl: d.fileUrl, releaseNotes: d.releaseNotes || d.description });
+      let updatedData = { version: newVer, name: newName, fileUrl: newUrl, releaseNotes: newNotes, history, updatedAt: serverTimestamp() };
+
+      const imgF = document.getElementById('new-ver-image').files[0];
+      if(imgF) updatedData.coverUrl = await fileToBase64(imgF);
+
+      await updateDoc(appRef, updatedData);
+      verForm.reset();
+      showToast('تمت إضافة التحديث بنجاح!');
+      document.getElementById('app-details-back')?.click();
+      fetchApps();
+    }
+  } catch (err) {
+    console.error(err);
+    showToast('تعذّر رفع التحديث، حاول تاني');
   }
 };
 
@@ -472,34 +486,45 @@ const appForm = document.getElementById('app-form');
 if(appForm) appForm.onsubmit = async (e) => {
   e.preventDefault();
   const id = document.getElementById('edit-id').value;
+  const submitBtn = appForm.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
   showToast('جاري الحفظ...');
-  const appData = {
-    name: document.getElementById('app-name').value,
-    category: document.getElementById('app-category').value,
-    version: document.getElementById('app-version').value,
-    description: document.getElementById('app-description').value,
-    fileUrl: document.getElementById('app-file').value,
-  };
-  const imgF = document.getElementById('app-image').files[0];
-  if (imgF) appData.coverUrl = await fileToBase64(imgF);
+  try {
+    const appData = {
+      name: document.getElementById('app-name').value,
+      category: document.getElementById('app-category').value,
+      version: document.getElementById('app-version').value,
+      description: document.getElementById('app-description').value,
+      fileUrl: document.getElementById('app-file').value,
+    };
+    const imgF = document.getElementById('app-image').files[0];
+    if (imgF) appData.coverUrl = await fileToBase64(imgF);
 
-  if (id) {
-    await updateDoc(doc(db, 'apps', id), appData);
-    showToast('تم تحديث التطبيق');
-  } else {
-    appData.createdAt = serverTimestamp();
-    appData.likes = 0;
-    appData.history = [];
-    appData.releaseNotes = "الإصدار الأول";
-    await addDoc(collection(db, 'apps'), appData);
-    showToast('تم النشر بنجاح');
+    if (id) {
+      await updateDoc(doc(db, 'apps', id), appData);
+      showToast('تم تحديث التطبيق');
+    } else {
+      appData.createdAt = serverTimestamp();
+      appData.likes = 0;
+      appData.history = [];
+      appData.releaseNotes = "الإصدار الأول";
+      await addDoc(collection(db, 'apps'), appData);
+      showToast('تم النشر بنجاح');
+    }
+    appForm.reset();
+    document.getElementById('cancel-edit')?.click();
+    fetchApps();
+  } catch (err) {
+    console.error(err);
+    showToast('تعذّر حفظ التطبيق، حاول تاني');
+  } finally {
+    submitBtn.disabled = false;
   }
-  appForm.reset();
-  document.getElementById('cancel-edit')?.click();
-  fetchApps();
 };
 
-// خوارزمية ضغط ومعالجة الصور HD للحفاظ على جودة خرافية بدون بكسلة
+// ضغط ومعالجة الصور وتحويلها لنص base64 يتخزن جوه مستند Firestore مباشرة
+// (رجّعنا لنفس الطريقة القديمة لأن Storage بيتطلب تفعيل خطة الدفع Blaze)
+// مقاس أصغر شوية من قبل عشان نقلل حجم المستند ونخفف البطء قد الإمكان بدون سيرفر صور خارجي
 function fileToBase64(file) {
   return new Promise((resolve) => {
     const reader = new FileReader();
@@ -509,28 +534,21 @@ function fileToBase64(file) {
       img.src = event.target.result;
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 1200; // حجم عالي الدقة HD
-        const MAX_HEIGHT = 1200;
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
         let width = img.width;
         let height = img.height;
 
         if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          }
+          if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
         } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
-            height = MAX_HEIGHT;
-          }
+          if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
         }
         canvas.width = width;
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
-        // الحفاظ على 92% من جودة ونقاء الصورة الأصلية
-        resolve(canvas.toDataURL('image/jpeg', 0.92));
+        resolve(canvas.toDataURL('image/jpeg', 0.8));
       };
     };
   });
@@ -635,6 +653,15 @@ if(forgotBtnMain) {
   };
 }
 
+// تطبيق حالة الأدمن فورًا على أي جزء ظاهر في الواجهة حاليًا (اللوحة + صفحة تفاصيل تطبيق لو مفتوحة)
+function applyAdminUI() {
+  const panel = document.getElementById('admin-panel');
+  if (panel) panel.classList.toggle('hidden', !isAdmin);
+  if (currentApp) {
+    document.getElementById('detail-admin-actions')?.classList.toggle('hidden', !isAdmin);
+  }
+}
+
 onAuthStateChanged(auth, async user => {
   const toggleVisibility = (id, hide) => { const el = document.getElementById(id); if(el) hide ? el.classList.add('hidden') : el.classList.remove('hidden'); };
   
@@ -646,13 +673,12 @@ onAuthStateChanged(auth, async user => {
     toggleVisibility('mobile-login-btn', true); toggleVisibility('mobile-signup-btn', true);
     toggleVisibility('logout-btn', false); toggleVisibility('mobile-logout-btn', false);
 
+    isAdmin = false;
     try {
       const aDoc = await getDoc(doc(db, 'admins', user.uid));
-      if (aDoc.exists() && aDoc.data().role === 'admin') {
-        isAdmin = true;
-        toggleVisibility('admin-panel', false);
-      }
+      isAdmin = aDoc.exists() && aDoc.data().role === 'admin';
     } catch(e) { isAdmin = false; }
+    applyAdminUI();
   } else {
     if(document.getElementById('user-email')) { document.getElementById('user-email').textContent = ''; document.getElementById('user-email').style.display = 'none'; }
     if(document.getElementById('mobile-user-email')) { document.getElementById('mobile-user-email').textContent = ''; document.getElementById('mobile-user-email').style.display = 'none'; }
@@ -660,8 +686,8 @@ onAuthStateChanged(auth, async user => {
     toggleVisibility('login-btn', false); toggleVisibility('signup-btn', false);
     toggleVisibility('mobile-login-btn', false); toggleVisibility('mobile-signup-btn', false);
     toggleVisibility('logout-btn', true); toggleVisibility('mobile-logout-btn', true);
-    toggleVisibility('admin-panel', true);
     isAdmin = false;
+    applyAdminUI();
   }
 });
 
