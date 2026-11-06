@@ -131,6 +131,7 @@ if(showProfBtn) {
 let allApps = [];
 let currentApp = null;
 let isAdmin = false;
+let versionEditContext = null; // null = إضافة إصدار جديد، {idx:null} = تعديل الإصدار الحالي، {idx:N} = تعديل إصدار قديم رقم N
 
 async function fetchApps() {
   const grid = document.getElementById('apps-grid');
@@ -234,13 +235,54 @@ function buildVersions(app) {
   const vList = document.getElementById('detail-versions-list');
   if(!vList) return;
   vList.innerHTML = '';
+
   const mainVer = document.createElement('div');
   mainVer.className = 'version-card-selectable active-version';
-  mainVer.innerHTML = `<div><b>v${app.version} (الأخير)</b><br><small style="color:var(--muted)">${app.releaseNotes || 'النسخة الحالية'}</small></div><span>محدد ✓</span>`;
-  mainVer.onclick = () => { 
+  mainVer.innerHTML = `
+    <div class="version-row-text"><b>v${app.version} (الأخير)</b><br><small style="color:var(--muted)">${app.releaseNotes || 'النسخة الحالية'}</small></div>
+    <div class="version-row-actions">
+      <span>محدد ✓</span>
+      ${isAdmin ? `
+        <button type="button" class="version-edit-btn" title="تعديل هذا الإصدار">✎</button>
+        <button type="button" class="version-delete-btn" title="حذف هذا الإصدار">🗑</button>
+      ` : ''}
+    </div>`;
+  mainVer.onclick = (e) => {
+    if (e.target.closest('.version-edit-btn') || e.target.closest('.version-delete-btn')) return;
     document.querySelectorAll('.version-card-selectable').forEach(c => { c.classList.remove('active-version'); c.classList.add('dimmed'); }); 
     mainVer.classList.add('active-version'); mainVer.classList.remove('dimmed'); 
     setActiveVersionUI(app, true, app.coverUrl); 
+  };
+  const mainEditBtn = mainVer.querySelector('.version-edit-btn');
+  if (mainEditBtn) mainEditBtn.onclick = (e) => { e.stopPropagation(); openVersionEditForm(app, null); };
+  const mainDelBtn = mainVer.querySelector('.version-delete-btn');
+  if (mainDelBtn) mainDelBtn.onclick = async (e) => {
+    e.stopPropagation();
+    if (!app.history || !app.history.length) {
+      showToast('ده آخر إصدار متبقي، لو عايز تمسحه احذف التطبيق كله');
+      return;
+    }
+    if (!confirm(`حذف الإصدار الحالي v${app.version}؟ هيتم استبداله تلقائيًا بآخر إصدار سابق.`)) return;
+    try {
+      const newHistory = [...app.history];
+      const promoted = newHistory.shift();
+      const updatedFields = {
+        version: promoted.version,
+        name: promoted.name,
+        fileUrl: promoted.fileUrl,
+        releaseNotes: promoted.releaseNotes || '',
+        history: newHistory
+      };
+      if (promoted.coverUrl) updatedFields.coverUrl = promoted.coverUrl;
+      await updateDoc(doc(db, 'apps', app.id), updatedFields);
+      Object.assign(app, updatedFields);
+      showToast('تم حذف الإصدار الحالي');
+      buildVersions(app);
+      setActiveVersionUI(app, true, app.coverUrl);
+    } catch (err) {
+      console.error(err);
+      showToast('تعذّر حذف الإصدار، حاول تاني');
+    }
   };
   vList.appendChild(mainVer);
 
@@ -252,34 +294,57 @@ function buildVersions(app) {
         <div class="version-row-text"><b>v${h.version}</b> <small style="color:var(--muted)">(سابق)</small><br><small style="color:var(--muted)">${h.releaseNotes || 'تحديثات سابقة'}</small></div>
         <div class="version-row-actions">
           <span>تصفح ↗</span>
-          ${isAdmin ? `<button type="button" class="version-delete-btn" title="حذف هذا الإصدار">🗑</button>` : ''}
+          ${isAdmin ? `
+            <button type="button" class="version-edit-btn" title="تعديل هذا الإصدار">✎</button>
+            <button type="button" class="version-delete-btn" title="حذف هذا الإصدار">🗑</button>
+          ` : ''}
         </div>`;
       oldVer.onclick = (e) => {
-        if (e.target.closest('.version-delete-btn')) return;
+        if (e.target.closest('.version-edit-btn') || e.target.closest('.version-delete-btn')) return;
         document.querySelectorAll('.version-card-selectable').forEach(c => { c.classList.remove('active-version'); c.classList.add('dimmed'); }); 
         oldVer.classList.add('active-version'); oldVer.classList.remove('dimmed'); 
         setActiveVersionUI(h, false, app.coverUrl); 
       };
+      const editBtn = oldVer.querySelector('.version-edit-btn');
+      if (editBtn) editBtn.onclick = (e) => { e.stopPropagation(); openVersionEditForm(app, idx); };
       const delBtn = oldVer.querySelector('.version-delete-btn');
-      if (delBtn) {
-        delBtn.onclick = async (e) => {
-          e.stopPropagation();
-          if (!confirm(`حذف الإصدار v${h.version} نهائيًا؟`)) return;
-          try {
-            const newHistory = app.history.filter((_, i) => i !== idx);
-            await updateDoc(doc(db, 'apps', app.id), { history: newHistory });
-            app.history = newHistory;
-            showToast('تم حذف الإصدار');
-            buildVersions(app);
-          } catch (err) {
-            console.error(err);
-            showToast('تعذّر حذف الإصدار، حاول تاني');
-          }
-        };
-      }
+      if (delBtn) delBtn.onclick = async (e) => {
+        e.stopPropagation();
+        if (!confirm(`حذف الإصدار v${h.version} نهائيًا؟`)) return;
+        try {
+          const newHistory = app.history.filter((_, i) => i !== idx);
+          await updateDoc(doc(db, 'apps', app.id), { history: newHistory });
+          app.history = newHistory;
+          showToast('تم حذف الإصدار');
+          buildVersions(app);
+        } catch (err) {
+          console.error(err);
+          showToast('تعذّر حذف الإصدار، حاول تاني');
+        }
+      };
       vList.appendChild(oldVer);
     });
   }
+}
+
+// فتح نافذة تعديل إصدار موجود (الحالي أو قديم) بدل إضافة إصدار جديد
+function openVersionEditForm(app, idx) {
+  versionEditContext = { idx };
+  document.getElementById('ver-app-id').value = app.id;
+  const titleEl = document.getElementById('version-modal-title');
+  if (titleEl) titleEl.textContent = 'تعديل الإصدار';
+  const subEl = document.getElementById('version-app-title');
+  if (subEl) subEl.textContent = app.name;
+  const submitBtn = document.getElementById('version-submit-btn');
+  if (submitBtn) submitBtn.textContent = 'حفظ التعديلات';
+
+  const data = (idx === null) ? app : app.history[idx];
+  document.getElementById('new-ver-number').value = data.version || '';
+  document.getElementById('new-ver-name').value = data.name || app.name;
+  document.getElementById('new-ver-url').value = data.fileUrl || '';
+  document.getElementById('new-ver-notes').value = data.releaseNotes || '';
+  document.getElementById('new-ver-image').value = '';
+  document.getElementById('version-modal')?.classList.remove('hidden');
 }
 
 const detailLikeBtn = document.getElementById('detail-like-btn');
@@ -448,9 +513,18 @@ document.getElementById('add-review-form').onsubmit = async (e) => {
 // أدمن: إصدار جديد
 const adminAddVerBtn = document.getElementById('admin-add-ver-btn');
 if(adminAddVerBtn) adminAddVerBtn.onclick = () => {
+  versionEditContext = null;
   document.getElementById('ver-app-id').value = currentApp.id;
+  const titleEl = document.getElementById('version-modal-title');
+  if (titleEl) titleEl.textContent = 'إضافة تحديث جديد';
+  const submitBtn = document.getElementById('version-submit-btn');
+  if (submitBtn) submitBtn.textContent = 'نشر الإصدار الجديد';
   document.getElementById('version-app-title').textContent = currentApp.name;
+  document.getElementById('new-ver-number').value = '';
   document.getElementById('new-ver-name').value = currentApp.name; 
+  document.getElementById('new-ver-url').value = '';
+  document.getElementById('new-ver-notes').value = '';
+  document.getElementById('new-ver-image').value = '';
   document.getElementById('version-modal')?.classList.remove('hidden');
 };
 const verCloseBtn = document.getElementById('version-modal-close');
@@ -464,31 +538,60 @@ if(verForm) verForm.onsubmit = async (e) => {
   const newName = document.getElementById('new-ver-name').value;
   const newUrl = document.getElementById('new-ver-url').value;
   const newNotes = document.getElementById('new-ver-notes').value;
+  const imgF = document.getElementById('new-ver-image').files[0];
+  const editCtx = versionEditContext;
 
   document.getElementById('version-modal')?.classList.add('hidden');
-  showToast('جاري رفع التحديث...');
+  showToast('جاري الحفظ...');
 
   try {
     const appRef = doc(db, 'apps', id);
-    const snap = await getDoc(appRef);
-    if (snap.exists()) {
-      const d = snap.data();
-      const history = d.history || [];
-      history.unshift({ version: d.version, name: d.name, coverUrl: d.coverUrl, fileUrl: d.fileUrl, releaseNotes: d.releaseNotes || d.description });
-      let updatedData = { version: newVer, name: newName, fileUrl: newUrl, releaseNotes: newNotes, history, updatedAt: serverTimestamp() };
 
-      const imgF = document.getElementById('new-ver-image').files[0];
-      if(imgF) updatedData.coverUrl = await fileToBase64(imgF);
+    if (editCtx && editCtx.idx !== null) {
+      // تعديل إصدار قديم في مكانه جوه سجل الإصدارات (من غير إزاحة باقي السجل)
+      const snap = await getDoc(appRef);
+      if (!snap.exists() || !(snap.data().history || [])[editCtx.idx]) throw new Error('version-not-found');
+      const history = snap.data().history;
+      const updatedEntry = { ...history[editCtx.idx], version: newVer, name: newName, fileUrl: newUrl, releaseNotes: newNotes };
+      if (imgF) updatedEntry.coverUrl = await fileToBase64(imgF);
+      history[editCtx.idx] = updatedEntry;
+      await updateDoc(appRef, { history });
+      if (currentApp?.id === id) { currentApp.history = history; buildVersions(currentApp); }
+      showToast('تم تعديل الإصدار بنجاح');
 
-      await updateDoc(appRef, updatedData);
-      verForm.reset();
-      showToast('تمت إضافة التحديث بنجاح!');
-      document.getElementById('app-details-back')?.click();
-      fetchApps();
+    } else if (editCtx && editCtx.idx === null) {
+      // تعديل الإصدار الحالي نفسه مباشرة
+      const updatedFields = { version: newVer, name: newName, fileUrl: newUrl, releaseNotes: newNotes };
+      if (imgF) updatedFields.coverUrl = await fileToBase64(imgF);
+      await updateDoc(appRef, updatedFields);
+      if (currentApp?.id === id) {
+        Object.assign(currentApp, updatedFields);
+        buildVersions(currentApp);
+        setActiveVersionUI(currentApp, true, currentApp.coverUrl);
+      }
+      showToast('تم تعديل الإصدار الحالي بنجاح');
+
+    } else {
+      // إضافة إصدار جديد (نفس السلوك الأصلي بدون أي تغيير)
+      const snap = await getDoc(appRef);
+      if (snap.exists()) {
+        const d = snap.data();
+        const history = d.history || [];
+        history.unshift({ version: d.version, name: d.name, coverUrl: d.coverUrl, fileUrl: d.fileUrl, releaseNotes: d.releaseNotes || d.description });
+        let updatedData = { version: newVer, name: newName, fileUrl: newUrl, releaseNotes: newNotes, history, updatedAt: serverTimestamp() };
+        if (imgF) updatedData.coverUrl = await fileToBase64(imgF);
+        await updateDoc(appRef, updatedData);
+        showToast('تمت إضافة التحديث بنجاح!');
+        document.getElementById('app-details-back')?.click();
+      }
     }
+
+    verForm.reset();
+    versionEditContext = null;
+    fetchApps();
   } catch (err) {
     console.error(err);
-    showToast('تعذّر رفع التحديث، حاول تاني');
+    showToast('تعذّر حفظ الإصدار، حاول تاني');
   }
 };
 
@@ -777,21 +880,25 @@ if(formC) {
         statusEl.textContent = 'تم استلام رسالتك ووصلت بنجاح لبريد المطور! ✓';
         statusEl.style.color = '#10b981';
         formC.reset();
+        setTimeout(() => statusEl.textContent = '', 6000);
       } else {
         const errText = await res.text().catch(() => '');
         console.error('Contact form failed', res.status, errText);
-        statusEl.textContent = 'تعذّر إرسال الرسالة، حاول تاني بعد شوية';
-        statusEl.style.color = '#ef4444';
+        showContactFallback(statusEl, message, name, email);
       }
     } catch (err) {
       console.error(err);
-      statusEl.textContent = 'تعذّر إرسال الرسالة، تأكد من اتصالك بالإنترنت وحاول تاني';
-      statusEl.style.color = '#ef4444';
+      showContactFallback(statusEl, message, name, email);
     } finally {
       submitBtn.disabled = false;
-      setTimeout(() => statusEl.textContent = '', 6000);
     }
   };
+}
+
+function showContactFallback(statusEl, message, name, email) {
+  const mailBody = encodeURIComponent(`${message}\n\n— ${name} (${email})`);
+  statusEl.innerHTML = `تعذّر إرسال الرسالة من هنا. تقدر تبعتها مباشرة عبر <a href="mailto:kareemammar2025@gmail.com?subject=${encodeURIComponent('رسالة من موقع KEMO DEVELOPER')}&body=${mailBody}" style="color:var(--accent); font-weight:800; text-decoration:underline;">البريد الإلكتروني</a>`;
+  statusEl.style.color = '#ef4444';
 }
 
 fetchApps();
