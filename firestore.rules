@@ -20,6 +20,16 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /stats/{docId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
     match /apps/{appId} {
       allow read: if true;
       allow create: if isAdmin()
