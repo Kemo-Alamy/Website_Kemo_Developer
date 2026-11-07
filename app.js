@@ -872,7 +872,8 @@ if(formC) {
           "الرسالة": message,
           "_subject": "رسالة جديدة من منصة KEMO DEVELOPER!",
           "_captcha": "false",
-          "_template": "table"
+          "_template": "table",
+          "_replyto": email
         })
       });
 
