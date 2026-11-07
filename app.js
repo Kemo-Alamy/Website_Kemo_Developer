@@ -860,31 +860,28 @@ if(formC) {
     submitBtn.disabled = true;
 
     try {
-      const res = await fetch("https://formsubmit.co/ajax/kareemammar2025@gmail.com", {
+      const formData = new FormData();
+      formData.append("access_key", "7f538b9c-791a-498e-8e84-f1b08ced7939");
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("message", message);
+      formData.append("subject", "رسالة جديدة من منصة KEMO DEVELOPER!");
+      formData.append("from_name", "KEMO DEVELOPER");
+
+      const res = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          "اسم المرسل": name,
-          "بريد المرسل": email,
-          "الرسالة": message,
-          "_subject": "رسالة جديدة من منصة KEMO DEVELOPER!",
-          "_captcha": "false",
-          "_template": "table",
-          "_replyto": email
-        })
+        body: formData
       });
 
-      if (res.ok) {
+      const result = await res.json().catch(() => ({}));
+
+      if (res.ok && result.success) {
         statusEl.textContent = 'تم استلام رسالتك ووصلت بنجاح لبريد المطور! ✓';
         statusEl.style.color = '#10b981';
         formC.reset();
         setTimeout(() => statusEl.textContent = '', 6000);
       } else {
-        const errText = await res.text().catch(() => '');
-        console.error('Contact form failed', res.status, errText);
+        console.error('Contact form failed', res.status, result);
         showContactFallback(statusEl, message, name, email);
       }
     } catch (err) {
