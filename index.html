@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f7fb">
+  <title>KEMO DEVELOPER</title>
+  <meta name="description" content="منصة Kemo Developer الرسمية، أفضل مكان لاكتشاف وتحميل أحدث التطبيقات والألعاب والأدوات الرقمية بأمان وبدون إعلانات مزعجة.">
+  <meta name="keywords" content="Kemo Developer, كيمو ديفلوبر, كريم عمار, تطبيقات أندرويد, ألعاب مجانية, تحميل برامج, مطور برمجيات">
+  <meta name="author" content="كريم عمار (KEMO)">
+  
+  <link rel="icon" type="image/png" sizes="96x96" href="favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <meta property="og:title" content="KEMO DEVELOPER">
+  <meta property="og:description" content="اكتشف أحدث الإصدارات، تصفّح مكتبتنا الرقمية، وحمّل تطبيقاتك المفضلة بسهولة من Kemo Developer.">
+  <meta property="og:image" content="favicon.png">
+  <meta property="og:url" content="https://kemo-alamy.github.io/Website_Kemo_Developer/">
+  <meta property="og:type" content="website">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="site-shell">
+    
+    <header class="header" id="top">
+      <a class="logo" href="#" onclick="location.reload()">
+        <span class="logo-symbol">K</span><span>KEMO<span class="logo-accent">.</span>DEVELOPER</span>
+      </a>
+      
+      <div class="header-actions desktop-actions">
+        <button id="theme-toggle" class="icon-btn" title="تغيير المظهر">☾</button>
+        <span id="user-email" class="user-email"></span>
+        <button id="login-btn" class="btn btn-outline small">دخول</button>
+        <button id="signup-btn" class="btn btn-dark small">إنشاء حساب</button>
+        <button id="logout-btn" class="btn btn-outline small hidden">خروج</button>
+      </div>
+
+      <div class="mobile-header-tools">
+        <button id="theme-toggle-mobile" class="icon-btn" title="تغيير المظهر">☾</button>
+        <button class="menu-toggle" id="menu-toggle" aria-label="فتح القائمة">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+      <nav class="nav" id="nav">
+        <a href="#about-me">عن المطور</a>
+        <a href="#apps">التطبيقات</a>
+        <a href="#updates">الجديد</a>
+        <a href="#contact">تواصل</a>
+        
+        <div class="mobile-auth-actions hidden-desktop">
+          <span id="mobile-user-email" class="user-email-mobile" style="display:block; text-align:center; font-size:12px; margin-bottom:10px; color:var(--accent);"></span>
+          <button id="mobile-login-btn" class="btn btn-outline full-width" style="margin-bottom: 8px;">تسجيل دخول</button>
+          <button id="mobile-signup-btn" class="btn btn-dark full-width">إنشاء حساب</button>
+          <button id="mobile-logout-btn" class="btn btn-outline full-width hidden">تسجيل خروج</button>
+        </div>
+      </nav>
+    </header>
+
+    <main id="home-view">
+      <div class="hero-fixed-bg">
+      <section class="hero section-wrap" id="home">
+        <div class="hero-content reveal">
+          <div class="availability"><span class="status-dot"></span> منصة البرمجيات والتطبيقات</div>
+          <h1>كل ما تحتاجه<br>من <span class="gradient-text">تطبيقات وألعاب</span><br>في مكان واحد.</h1>
+          <p class="hero-lead">اكتشف أحدث الإصدارات، تصفّح مكتبتنا الرقمية، وحمّل تطبيقاتك المفضلة بسهولة.</p>
+          <div class="hero-buttons">
+            <a class="btn btn-dark" href="#apps">استكشف المكتبة <span>←</span></a>
+            <a class="btn btn-text" href="#about-me">عن المطور <span>↙</span></a>
+          </div>
+          <div class="hero-meta">
+            <div><strong id="live-visitors-count">0</strong><span>زائر حقيقي</span></div><i></i>
+            <div><strong id="app-count">0</strong><span>تطبيق متاح</span></div><i></i>
+            <div><strong>Free</strong><span>تحميل مباشر</span></div>
+          </div>
+        </div>
+        <div class="hero-visual reveal">
+          <div class="visual-grid"></div><div class="visual-glow"></div>
+          <div class="floating-card card-top"><span class="mini-icon purple">✦</span><div><b>تحديثات مستمرة</b><small>محتوى جديد باستمرار</small></div></div>
+          <div class="app-window">
+            <div class="window-bar"><span></span><span></span><span></span><small>KEMO LIBRARY</small></div>
+            <div class="window-content"><div class="window-logo">K<span>.</span></div><b>Discover something<br>new today.</b><p>Apps · Games · Tools</p></div>
+          </div>
+          <div class="floating-card card-bottom"><span class="mini-icon blue">↗</span><div><b>تجربة بسيطة</b><small>تصميم سريع ومتجاوب</small></div></div>
+        </div>
+      </section>
+      </div>
+
+      <div class="main-panel">
+      <section class="section-wrap" id="about-me" style="margin-top: 35px; margin-bottom: 30px;">
+        <div class="developer-hero-card reveal">
+          <div class="dev-card-ambient"></div>
+          <div class="dev-card-inner">
+            <div class="dev-avatar-wrapper">
+              <div class="dev-avatar-ring"><img id="profile-img" src="https://via.placeholder.com/150" alt="صورة المطور"></div>
+              <div class="dev-status-tag"><span class="status-beacon"></span> متاح للمشاريع</div>
+            </div>
+            <div class="dev-content-wrapper">
+              <div class="dev-badge-row"><span class="cyber-badge" id="profile-tag">LEAD SOFTWARE DEVELOPER</span></div>
+              <h2 class="dev-name" id="profile-name">كريم عمار (KEMO)</h2>
+              <p class="dev-description" id="profile-bio">مطور برمجيات وتطبيقات أندرويد وويب. أهدف إلى تقديم أدوات وتطبيقات مبتكرة بحلول تقنية متقدمة.</p>
+              <div class="dev-social-dock">
+                <a href="#" id="link-facebook" target="_blank" class="dev-social-icon fb"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+                <a href="#" id="link-whatsapp" target="_blank" class="dev-social-icon wa"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg></a>
+                <a href="#" id="link-instagram" target="_blank" class="dev-social-icon ig"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+                <a href="#" id="link-github" target="_blank" class="dev-social-icon gh"><svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-wrap section-block" id="apps">
+        <div class="section-heading reveal">
+          <div><span class="eyebrow">المكتبة الرقمية</span><h2>استكشف <span class="gradient-text">التطبيقات</span></h2></div>
+        </div>
+        <div class="catalog-tools reveal">
+          <div class="search-wrap"><span>⌕</span><input id="search-input" type="search" placeholder="ابحث عن تطبيق أو لعبة..."></div>
+          <div id="category-filters" class="filters">
+            <button class="filter active" data-category="all">الكل</button>
+            <button class="filter" data-category="تطبيقات">تطبيقات</button>
+            <button class="filter" data-category="ألعاب">ألعاب</button>
+          </div>
+        </div>
+        <div id="apps-grid" class="work-boxes"><div class="loading-state">جاري التجهيز...</div></div>
+      </section>
+
+      <section class="feature-band section-wrap reveal" id="updates">
+        <div class="feature-copy"><span class="eyebrow">ابقَ على اطلاع</span><h2>الجديد دائمًا<br><span class="gradient-text">في مكان واحد.</span></h2><p>تابع التحديثات المستمرة والتطبيقات المضافة حديثاً.</p><a class="btn btn-dark" href="#apps">شاهد الإضافات <span>←</span></a></div>
+        <div class="feature-stack"><div class="stack-card stack-one"><span class="stack-number">01</span><div><b>إصدارات جديدة</b><small>ألعاب وتطبيقات</small></div><span class="stack-arrow">↗</span></div><div class="stack-card stack-two"><span class="stack-number">02</span><div><b>تحميل مباشر</b><small>بدون إعلانات</small></div><span class="stack-arrow">↗</span></div></div>
+      </section>
+
+      <section class="contact-section section-wrap section-block" id="contact">
+        <div class="contact-copy reveal"><span class="eyebrow">تواصل معنا</span><h2>هل لديك <span class="gradient-text">استفسار؟</span></h2><p>يسعدنا استقبال رسائلك.</p></div>
+        <form class="contact-form reveal" id="contact-form"><label>الاسم<input id="contact-name" required></label><label>البريد<input id="contact-email" type="email" required></label><label>الرسالة<textarea id="contact-message" required rows="4"></textarea></label><button class="btn btn-dark" type="submit">إرسال <span>←</span></button><p id="contact-status" class="form-status"></p></form>
+      </section>
+      </div>
+    </main>
+
+    <!-- صفحة تفاصيل التطبيق الكاملة -->
+    <section id="app-details-view" class="fullpage-view hidden">
+      <div class="fullpage-container section-wrap">
+        <div class="fullpage-topbar">
+          <button class="back-btn" id="app-details-back">← العودة للرئيسية</button>
+          <span class="app-tag-pill" id="detail-app-category"></span>
+        </div>
+        <div class="fullpage-hero">
+          <div class="app-display-cover"><img id="detail-app-cover" src="" alt=""></div>
+          <div class="app-display-meta">
+            <h1 id="detail-app-name"></h1>
+            <div class="active-version-indicator" id="detail-app-latest-ver"></div>
+            <div class="action-buttons-group">
+              <a id="detail-download-btn" href="#" target="_blank" class="btn btn-dark install-action-btn">تثبيت ⤓</a>
+              <button id="detail-like-btn" class="like-button-neon">♥ <span id="detail-likes-count">0</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="fullpage-body-grid">
+          <div class="app-description-box">
+            <h3>تفاصيل ومميزات الإصدار</h3>
+            <p id="detail-app-desc" style="white-space: pre-wrap;"></p>
+          </div>
+          <div class="versions-control-box">
+            <h3>سجل الإصدارات والتحديثات</h3>
+            <div id="detail-versions-list" class="versions-interactive-list"></div>
+          </div>
+        </div>
+        <div class="reviews-section-full">
+          <h3>آراء المستخدمين (<span id="reviews-count">0</span>)</h3>
+          <div id="reviews-list" class="reviews-feed"></div>
+          <form id="add-review-form" class="review-compose-form">
+            <input type="text" id="review-user-name" placeholder="اسمك" required>
+            <textarea id="review-user-text" placeholder="اكتب رأيك بصراحة..." rows="2" required></textarea>
+            <button type="submit" class="btn btn-dark">نشر التعليق</button>
+          </form>
+        </div>
+        <div id="detail-admin-actions" class="modal-admin-actions hidden">
+          <small>أدوات الأدمن:</small>
+          <div class="admin-inline-btns">
+            <button id="admin-add-ver-btn" class="btn btn-dark small">+ إصدار جديد</button>
+            <button id="admin-edit-app-btn" class="btn btn-outline small">تعديل البيانات</button>
+            <button id="admin-delete-app-btn" class="btn btn-outline small delete-red">حذف التطبيق</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- نافذة إضافة إصدار جديد -->
+    <div id="version-modal" class="modal hidden">
+      <div class="modal-card version-modal-card">
+        <button class="modal-close" id="version-modal-close">×</button>
+        <div class="version-modal-header">
+          <div class="v-icon">⬆️</div>
+          <div><h2 id="version-modal-title">إضافة تحديث جديد</h2><p id="version-app-title" class="modal-subtitle"></p></div>
+        </div>
+        <form id="version-form" class="admin-form">
+          <input type="hidden" id="ver-app-id">
+          <label>رقم الإصدار<input id="new-ver-number" placeholder="مثال: 2.1" required></label>
+          <label>اسم التطبيق<input id="new-ver-name" placeholder="الاسم في هذا الإصدار" required></label>
+          <label class="wide">أيقونة الإصدار الجديد (اختياري)<input id="new-ver-image" type="file" accept="image/*"></label>
+          <label class="wide">رابط التحميل<input id="new-ver-url" type="url" placeholder="رابط الملف" required></label>
+          <label class="wide">ما الجديد؟<textarea id="new-ver-notes" rows="3" required></textarea></label>
+          <div class="admin-form-actions wide">
+            <button class="btn btn-dark full-width" type="submit" id="version-submit-btn">نشر الإصدار الجديد</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- لوحة الإدارة -->
+    <section id="admin-panel" class="admin-panel hidden section-wrap">
+      <div class="admin-top">
+        <div><span class="eyebrow">لوحة التحكم</span><h2>إدارة الموقع</h2></div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-dark small" id="show-app-form-btn">تطبيق جديد</button>
+          <button class="btn btn-outline small" id="show-profile-form-btn">تعديل ملفي</button>
+        </div>
+      </div>
+      
+      <form id="app-form" class="admin-form">
+        <input id="edit-id" type="hidden">
+        <label>اسم التطبيق<input id="app-name" required maxlength="80"></label>
+        <label>التصنيف<select id="app-category"><option>تطبيقات</option><option>ألعاب</option><option>أدوات</option></select></label>
+        <label>الإصدار الأول<input id="app-version" required></label>
+        <label>الغلاف<input id="app-image" type="file" accept="image/*"></label>
+        <label class="wide">رابط التحميل<input id="app-file" type="url" required></label>
+        <label class="wide">الوصف<textarea id="app-description" required rows="3"></textarea></label>
+        <div class="admin-form-actions wide">
+          <button class="btn btn-dark" id="save-app" type="submit">حفظ التطبيق</button>
+          <button class="btn btn-outline hidden" id="cancel-edit" type="button">إلغاء</button>
+        </div>
+      </form>
+
+      <form id="profile-form" class="admin-form hidden">
+        <label>الاسم الظاهر<input id="edit-profile-name" required></label>
+        <label>اللقب<input id="edit-profile-tag" required></label>
+        <label class="wide">نبذة<textarea id="edit-profile-bio" rows="3" required></textarea></label>
+        <label class="wide">الصورة<input id="edit-profile-img" type="file" accept="image/*"></label>
+        <label>فيسبوك<input id="edit-profile-fb" type="url"></label>
+        <label>واتساب<input id="edit-profile-wa" type="url"></label>
+        <label>انستجرام<input id="edit-profile-ig" type="url"></label>
+        <label>جيت هاب<input id="edit-profile-gh" type="url"></label>
+        <div class="admin-form-actions wide">
+          <button class="btn btn-dark full-width" type="submit">حفظ الملف</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- نافذة تسجيل الدخول البسيطة والصلبة (مستحيل تبوظ) -->
+    <div id="auth-modal" class="modal hidden">
+      <div class="modal-card">
+        <button class="modal-close" id="auth-close">×</button>
+        <div class="auth-header">
+          <div class="auth-logo">K.</div>
+          <h2 id="auth-title">تسجيل الدخول</h2>
+        </div>
+        <form id="auth-form" class="auth-solid-form">
+          <label id="name-field" class="hidden">الاسم الكريم<input id="display-name" autocomplete="name" placeholder="اسمك"></label>
+          <label>البريد الإلكتروني<input id="auth-email" type="email" autocomplete="email" required placeholder="name@example.com"></label>
+          <label id="pass-field">كلمة المرور<input id="auth-password" type="password" minlength="6" required placeholder="••••••••"></label>
+          <button class="btn btn-dark full-width auth-submit-btn" id="auth-submit">دخول</button>
+        </form>
+        <button class="text-action" id="forgot-password">نسيت كلمة المرور؟</button>
+        <div class="auth-footer">
+          <span id="switch-label">ليس لديك حساب؟</span>
+          <button id="auth-switch">إنشاء حساب جديد</button>
+        </div>
+      </div>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+  </div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

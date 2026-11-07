@@ -1,0 +1,19 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isAdmin() {
+      return request.auth != null
+        && firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid))
+        && firestore.get(/databases/(default)/documents/admins/$(request.auth.uid)).data.role == "admin";
+    }
+
+    match /apps/{appId}/{fileName} {
+      allow read: if true;
+      allow write: if isAdmin()
+        && request.resource != null
+        && request.resource.size < 200 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*|application/vnd.android.package-archive|application/zip|application/octet-stream');
+      allow delete: if isAdmin();
+    }
+  }
+}
