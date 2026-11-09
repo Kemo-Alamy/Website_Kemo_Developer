@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index, follow" />
+
+    <meta name="description" content="منصة Kemo Developer الرسمية، أفضل مكان لاكتشاف وتحميل أحدث التطبيقات والألعاب والأدوات الرقمية." />
+    <meta property="og:title" content="KEMO DEVELOPER">
+    <meta property="og:description" content="منصة Kemo Developer الرسمية، أفضل مكان لاكتشاف وتحميل أحدث التطبيقات والألعاب والأدوات الرقمية.">
+    <meta property="og:image" content="favicon.png">
+
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+    <link rel="preload" href="Mona-Sans.woff2" as="font" type="font/woff2" crossorigin />
+
+    <link rel="stylesheet" href="style.css" />
+
+    <title>KEMO DEVELOPER</title>
+  </head>
+
+  <body>
+    <script>
+      const theme = localStorage.getItem("theme") || "dark";
+      document.body.classList.add(theme);
+    </script>
+
+    <header class="header">
+      <div class="menu-btn-container">
+        <div class="container menu-btn-row">
+          <button type="button" class="lang-switch-btn" id="lang-switch-btn" title="Switch language">🌐 <span id="lang-switch-label">EN</span></button>
+          <button type="button" class="menu-btn" data-ar="القائمة" data-en="Menu">القائمة</button>
+        </div>
+      </div>
+
+      <nav class="nav hidden">
+        <ol class="nav-items">
+          <li class="nav-item"><a href="#" data-ar="الرئيسية" data-en="Home">الرئيسية</a></li>
+          <li class="nav-item"><a href="#apps" data-ar="التطبيقات" data-en="Apps">التطبيقات</a></li>
+          <li class="nav-item"><a href="#contact" data-focused="last-focused" data-ar="تواصل معايا" data-en="Contact">تواصل معايا</a></li>
+        </ol>
+
+        <div class="nav-account-box" id="nav-guest-area">
+          <span class="nav-account-label" data-ar="حسابك" data-en="Account">حسابك</span>
+          <a href="#" class="nav-auth-btn" id="nav-login-btn" data-ar="تسجيل الدخول" data-en="Log in">تسجيل الدخول</a>
+        </div>
+        <div class="nav-account-box hidden-el" id="nav-user-area">
+          <span class="nav-account-label" data-ar="حسابك" data-en="Account">حسابك</span>
+          <span class="nav-account-email" id="nav-user-email"></span>
+          <a href="#" class="nav-auth-btn hidden-el" id="nav-admin-btn" data-ar="+ تطبيق جديد" data-en="+ New App">+ تطبيق جديد</a>
+          <a href="#" class="nav-auth-btn hidden-el" id="nav-admin-profile-btn" data-ar="تعديل ملفي" data-en="Edit Profile">تعديل ملفي</a>
+          <a href="#" class="nav-auth-btn" id="nav-logout-btn" data-ar="تسجيل الخروج" data-en="Log out">تسجيل الخروج</a>
+        </div>
+      </nav>
+
+      <div class="container">
+        <div class="header-textbox">
+          <div class="profile-avatar-wrap">
+            <img id="profile-avatar" src="" alt="" class="hidden-el">
+          </div>
+          <h1 class="h1">
+            <span id="profile-line1">أهلًا، أنا كيمو</span>
+            <span id="profile-line2">مطور برمجيات وتطبيقات أندرويد</span>
+          </h1>
+
+          <p class="header-text" id="profile-bio">
+            بنيت تطبيقات وبوتات وألعاب ثلاثية الأبعاد، وهنا هتلاقي كل مشروع بتفاصيله وآخر تحديثاته.
+          </p>
+
+          <div class="header-btns">
+            <a href="#contact" class="btn btn-cta" data-ar="تواصل معايا" data-en="Contact Me">تواصل معايا</a>
+            <a href="#apps" class="btn btn-secondary" data-ar="شوف التطبيقات" data-en="See Apps">شوف التطبيقات</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="work">
+        <div class="container">
+          <h2 class="h2" id="apps" data-ar="التطبيقات والألعاب" data-en="Apps &amp; Games">التطبيقات والألعاب</h2>
+
+          <div class="catalog-tools">
+            <div class="search-wrap">
+              <input id="search-input" type="search" placeholder="ابحث عن تطبيق أو لعبة..." data-ar-ph="ابحث عن تطبيق أو لعبة..." data-en-ph="Search for an app or game...">
+            </div>
+            <div class="filters" id="category-filters">
+              <button class="filter active" data-category="all" data-ar="الكل" data-en="All">الكل</button>
+              <button class="filter" data-category="تطبيقات" data-ar="تطبيقات" data-en="Apps">تطبيقات</button>
+              <button class="filter" data-category="ألعاب" data-ar="ألعاب" data-en="Games">ألعاب</button>
+              <button class="filter" data-category="أدوات" data-ar="أدوات" data-en="Tools">أدوات</button>
+            </div>
+          </div>
+
+          <div class="work-boxes" id="apps-grid">
+            <div class="loading-state">جاري التجهيز...</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="contact">
+        <div class="container">
+          <h2 class="h2" id="contact" data-ar="تواصل معايا" data-en="Get in Touch">تواصل معايا</h2>
+          <div class="contact-content">
+            <div class="contact-textbox">
+              <strong href="#" class="hire-alert">
+                <span class="indicator"></span>
+                متاح لاستلام رسائلكم
+              </strong>
+              <p class="contact-text" id="profile-text1">
+                بطوّر تطبيقات أندرويد وبوتات وألعاب ومشاريع برمجية من الصفر، وبحب أحوّل الأفكار لحاجة حقيقية شغالة.
+              </p>
+              <p class="contact-text" id="profile-text2">
+                لو عندك فكرة تطبيق أو سؤال، ابعتلي من الفورم ده وهيوصلني على طول.
+              </p>
+            </div>
+            <form action="#" class="contact-form" id="contact-form">
+              <div class="form-field">
+                <label for="contact-name" data-ar="الاسم" data-en="Name">الاسم</label>
+                <input type="text" name="name" id="contact-name" required />
+              </div>
+              <div class="form-field">
+                <label for="contact-email" data-ar="البريد الإلكتروني" data-en="Email">البريد الإلكتروني</label>
+                <input type="email" name="email" id="contact-email" required inputmode="email" />
+              </div>
+              <div class="form-field">
+                <label for="contact-message" data-ar="محتاج مساعدة في إيه؟" data-en="How can I help you?">محتاج مساعدة في إيه؟</label>
+                <textarea name="message" id="contact-message" required></textarea>
+              </div>
+              <button type="submit" class="btn btn-cta" data-ar="إرسال" data-en="Send">إرسال</button>
+              <p id="contact-status" style="margin-block-start:14px; font-size:var(--text-small);"></p>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- صفحة تفاصيل التطبيق -->
+    <section id="app-detail-overlay" class="app-detail-overlay hidden-el">
+      <div class="container">
+        <div class="app-detail-topbar">
+          <a href="#" class="link" id="app-detail-back">← رجوع للرئيسية</a>
+        </div>
+
+        <div class="app-detail-hero">
+          <picture class="detail-cover-box">
+            <img id="detail-cover" src="" alt="">
+          </picture>
+          <div class="app-detail-meta">
+            <h1 class="h3" id="detail-name"></h1>
+            <p class="header-text" id="detail-version-label" style="font-size:var(--text-small); margin-block:10px;"></p>
+            <ol class="detail-tags-list" id="detail-tags"></ol>
+            <div class="detail-actions-row" style="margin-block-start:14px;">
+              <a href="#" target="_blank" class="btn btn-cta" id="detail-download-btn" style="padding:14px 34px; font-size:1rem;">تثبيت</a>
+              <button type="button" class="icon-btn-circle" id="detail-like-btn" style="width:44px; height:44px; font-size:18px;">♥</button>
+              <span id="detail-likes-count" style="color:var(--sub);"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="app-detail-body">
+          <div>
+            <h3 class="h4">تفاصيل الإصدار</h3>
+            <p class="detail-text" id="detail-description" style="white-space:pre-wrap;"></p>
+
+            <div id="detail-admin-actions" class="hidden-el" style="margin-block-start:var(--gutter-medium); padding-block-start:var(--gutter-x-small); border-top:1px solid var(--border);">
+              <h4 class="h4" style="font-size:1.1rem; margin-block-end:10px;">أدوات الأدمن</h4>
+              <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="admin-edit-app-btn">تعديل البيانات</button>
+                <button type="button" class="btn btn-secondary" id="admin-add-ver-btn">+ إصدار جديد</button>
+                <button type="button" class="btn btn-danger" id="admin-delete-app-btn">حذف التطبيق</button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="h4">سجل الإصدارات</h3>
+            <div id="detail-versions-list" style="margin-block-start:var(--gutter-x-small);"></div>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid var(--border); padding-block-start:var(--gutter-large); margin-block-end:var(--gutter-x-large);">
+          <h3 class="h4">آراء المستخدمين (<span id="reviews-count">0</span>)</h3>
+          <ol class="reviews-list" id="reviews-list"></ol>
+          <form id="add-review-form" class="review-form">
+            <div class="star-rating-input" id="review-stars"></div>
+            <input type="text" id="review-user-name" placeholder="اسمك" required>
+            <textarea id="review-user-text" placeholder="اكتب رأيك..." rows="2" required></textarea>
+            <button type="submit" class="btn btn-secondary" style="align-self:flex-start;">نشر التقييم</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <nav>
+            <ol class="footer-links">
+              <li class="footer-link"><a title="GitHub" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg></a></li>
+              <li class="footer-link"><a title="WhatsApp" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg></a></li>
+              <li class="footer-link"><a title="Instagram" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a></li>
+              <li class="footer-link"><a title="Facebook" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a></li>
+            </ol>
+          </nav>
+          <p class="footer-text">
+            &copy; <span>2026</span> — KEMO.DEVELOPER
+          </p>
+          <label class="theme-switch" for="theme-switch">
+            <span data-ar="الوضع الداكن" data-en="Dark theme">الوضع الداكن</span>
+            <input type="checkbox" id="theme-switch" role="switch"/>
+          </label>
+        </div>
+      </div>
+    </footer>
+
+    <!-- نافذة تسجيل الدخول -->
+    <div class="modal-overlay hidden-el" id="auth-modal">
+      <div class="modal-card">
+        <button class="modal-close-x" id="auth-modal-close">×</button>
+        <h2 class="h3" id="auth-modal-title" data-ar="تسجيل الدخول" data-en="Log in">تسجيل الدخول</h2>
+        <form id="auth-form">
+          <div class="form-field hidden-el" id="auth-name-field">
+            <label for="auth-display-name">اسمك</label>
+            <input type="text" id="auth-display-name">
+          </div>
+          <div class="form-field">
+            <label for="auth-email">البريد الإلكتروني</label>
+            <input type="email" id="auth-email" required>
+          </div>
+          <div class="form-field">
+            <label for="auth-password">كلمة المرور</label>
+            <input type="password" id="auth-password" minlength="6" required>
+          </div>
+          <button type="submit" class="btn btn-cta" style="width:100%;" id="auth-submit-btn" data-ar="دخول" data-en="Log in">دخول</button>
+        </form>
+        <p style="margin-block-start:16px; font-size:var(--text-small);">
+          <button type="button" class="switch-auth-mode" id="auth-forgot-btn" data-ar="نسيت كلمة المرور؟" data-en="Forgot password?">نسيت كلمة المرور؟</button>
+        </p>
+        <p style="margin-block-start:10px; font-size:var(--text-small);" id="auth-switch-label">
+          مفيش حساب؟ <button type="button" class="switch-auth-mode" id="auth-switch-btn">إنشاء حساب جديد</button>
+        </p>
+      </div>
+    </div>
+
+    <!-- نافذة إضافة/تعديل تطبيق -->
+    <div class="modal-overlay hidden-el" id="app-modal">
+      <div class="modal-card wide">
+        <button class="modal-close-x" id="app-modal-close">×</button>
+        <h2 class="h3" id="app-modal-title" data-ar="تطبيق جديد" data-en="New App">تطبيق جديد</h2>
+        <form id="app-form">
+          <input type="hidden" id="edit-id">
+          <div class="form-grid">
+            <div class="form-field compact"><label>اسم التطبيق</label><input id="app-name" required></div>
+            <div class="form-field compact">
+              <label>التصنيف</label>
+              <select id="app-category"><option>تطبيقات</option><option>ألعاب</option><option>أدوات</option></select>
+            </div>
+            <div class="form-field compact"><label>الإصدار</label><input id="app-version" required></div>
+            <div class="form-field compact"><label>غلاف التطبيق</label><input id="app-image" type="file" accept="image/*"></div>
+            <div class="form-field compact wide-field"><label>رابط التحميل</label><input id="app-file" type="url" required></div>
+            <div class="form-field compact wide-field"><label>الوصف</label><textarea id="app-description" rows="3" required></textarea></div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-cta">حفظ التطبيق</button>
+            <button type="button" class="btn btn-secondary hidden-el" id="app-cancel-edit">إلغاء</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- نافذة إضافة إصدار جديد -->
+    <div class="modal-overlay hidden-el" id="version-modal">
+      <div class="modal-card">
+        <button class="modal-close-x" id="version-modal-close">×</button>
+        <h2 class="h3" id="version-modal-title">إضافة تحديث جديد</h2>
+        <form id="version-form">
+          <input type="hidden" id="ver-app-id">
+          <div class="form-field compact"><label>رقم الإصدار</label><input id="new-ver-number" required></div>
+          <div class="form-field compact"><label>اسم التطبيق</label><input id="new-ver-name" required></div>
+          <div class="form-field compact"><label>غلاف الإصدار (اختياري)</label><input id="new-ver-image" type="file" accept="image/*"></div>
+          <div class="form-field compact"><label>رابط التحميل</label><input id="new-ver-url" type="url" required></div>
+          <div class="form-field compact"><label>ما الجديد؟</label><textarea id="new-ver-notes" rows="3" required></textarea></div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-cta" id="version-submit-btn">نشر الإصدار الجديد</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- نافذة تعديل الملف الشخصي -->
+    <div class="modal-overlay hidden-el" id="profile-modal">
+      <div class="modal-card wide">
+        <button class="modal-close-x" id="profile-modal-close">×</button>
+        <h2 class="h3">تعديل الملف الشخصي</h2>
+        <form id="profile-form">
+          <div class="form-grid">
+            <div class="form-field compact wide-field"><label>صورة البروفايل</label><input id="edit-profile-avatar" type="file" accept="image/*"></div>
+            <div class="form-field compact"><label>السطر الأول (الاسم)</label><input id="edit-profile-line1" required></div>
+            <div class="form-field compact"><label>السطر الثاني (الوظيفة)</label><input id="edit-profile-line2" required></div>
+            <div class="form-field compact wide-field"><label>النص تحت الاسم</label><textarea id="edit-profile-bio" rows="2" required></textarea></div>
+            <div class="form-field compact wide-field"><label>فقرة التواصل الأولى</label><textarea id="edit-profile-text1" rows="2" required></textarea></div>
+            <div class="form-field compact wide-field"><label>فقرة التواصل الثانية</label><textarea id="edit-profile-text2" rows="2" required></textarea></div>
+            <div class="form-field compact"><label>فيسبوك</label><input id="edit-profile-fb" type="url"></div>
+            <div class="form-field compact"><label>واتساب</label><input id="edit-profile-wa" type="url"></div>
+            <div class="form-field compact"><label>انستجرام</label><input id="edit-profile-ig" type="url"></div>
+            <div class="form-field compact"><label>جيت هاب</label><input id="edit-profile-gh" type="url"></div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-cta" data-ar="حفظ" data-en="Save">حفظ</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <button type="button" class="btn btn-secondary hidden-el" id="open-admin-panel-trigger" style="display:none;"></button>
+
+    <div class="toast-msg" id="toast"></div>
+
+    <script src="script.js" defer></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
