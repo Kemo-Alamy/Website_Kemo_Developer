@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kemo-alamy.github.io/Website_Kemo_Developer/sitemap.xml
