@@ -106,7 +106,7 @@ function renderProfileDisplay(d) {
   if (d.avatar && el('profile-avatar')) { el('profile-avatar').src = d.avatar; el('profile-avatar').classList.remove('hidden-el'); }
   if (d.avatar && el('stats-image-box')) el('stats-image-box').innerHTML = `<img src="${d.avatar}" alt="" loading="lazy">`;
   const FALLBACK = {
-    line1: { ar: 'أهلًا، أنا كيمو 👋', en: "Hey, I'm Kemo 👋" },
+    line1: { ar: 'أهلًا، أنا كريم عمار المعروف ب كيمو 👋', en: "Hey, I'm Kemo 👋" },
     line2: { ar: 'بعمل تطبيقات أندرويد ومواقع وبوتات', en: 'I build Android apps, websites & bots' },
     bio: { ar: 'بحب أحول أي فكرة لحاجة شغالة فعلاً. بابني كل حاجة بنفسي من الصفر وبهتم إنها تبقى سريعة وسهلة ومريحة في الاستخدام 🚀', en: 'I turn ideas into things that actually work. I build everything myself from scratch, and I care about it being fast, simple, and nice to use 🚀' },
     text1: { ar: 'عندك فكرة تطبيق أو سؤال؟ ابعتلي وهرد عليك بنفسي.', en: 'Got an app idea or a question? Just message me, I reply personally.' },
