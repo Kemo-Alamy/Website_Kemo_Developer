@@ -1,0 +1,108 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == "admin";
+    }
+
+    match /admins/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid;
+      allow list, create, update, delete: if false;
+    }
+
+    match /users/{uid} {
+      allow create: if signedIn() && request.auth.uid == uid
+        && request.resource.data.email == request.auth.token.email;
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow update: if signedIn() && request.auth.uid == uid
+        && (
+          // أي تحديث عادي لبياناته هو
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['reviewCount'])
+          ||
+          // أو زيادة عداد التعليقات بواحد بالظبط، وبحد أقصى يوصله لـ 5
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reviewCount'])
+            && request.resource.data.reviewCount == (resource.data.reviewCount is int ? resource.data.reviewCount : 0) + 1
+            && request.resource.data.reviewCount <= 5)
+        );
+      allow delete: if false;
+    }
+
+    // أكواد التحقق (تسجيل حساب جديد + دخول الأدمن) — الحماية الحقيقية هنا إن
+    // اسم المستند نفسه رمز عشوائي طويل مش معروف لحد غير المتصفح اللي طلبه
+    match /verification_codes/{token} {
+      allow create: if request.resource.data.code is string
+        && request.resource.data.code.size() == 6
+        && request.resource.data.email is string
+        && request.resource.data.used == false;
+      allow read: if true;
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used'])
+        && request.resource.data.used == true;
+      allow delete: if false;
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /stats/{docId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasOnly(['count'])
+        && request.resource.data.count is int;
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['count'])
+        && request.resource.data.count is int;
+      allow delete: if false;
+    }
+
+    match /apps/{appId} {
+      allow read: if true;
+      allow create: if isAdmin()
+        && request.resource.data.name_ar is string
+        && request.resource.data.name_ar.size() > 0
+        && request.resource.data.description_ar is string;
+      allow update: if (isAdmin()
+          && request.resource.data.name_ar is string
+          && request.resource.data.description_ar is string)
+        || (signedIn()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes'])
+          && request.resource.data.likes is int
+          && (
+            (request.resource.data.likes == resource.data.likes + 1
+              && !exists(/databases/$(database)/documents/apps/$(appId)/likedBy/$(request.auth.uid)))
+            ||
+            (request.resource.data.likes == resource.data.likes - 1
+              && exists(/databases/$(database)/documents/apps/$(appId)/likedBy/$(request.auth.uid)))
+          ));
+      allow delete: if isAdmin();
+
+      // علامة "ده عمل لايك" لكل مستخدم — مش عداد، مجرد يثبت هو لسه حاطط لايك ولا لأ
+      match /likedBy/{uid} {
+        allow read: if true;
+        allow create, delete: if signedIn() && request.auth.uid == uid;
+        allow update: if false;
+      }
+
+      match /reviews/{reviewId} {
+        allow read: if true;
+        allow create: if signedIn()
+          && request.resource.data.keys().hasOnly(['name', 'text', 'rating', 'createdAt', 'uid'])
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.name is string
+          && request.resource.data.name.size() > 0
+          && request.resource.data.name.size() <= 60
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 500
+          && request.resource.data.rating is int
+          && request.resource.data.rating >= 1
+          && request.resource.data.rating <= 5
+          && (!('reviewCount' in get(/databases/$(database)/documents/users/$(request.auth.uid)).data)
+              || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.reviewCount < 5);
+        allow update, delete: if isAdmin();
+      }
+    }
+  }
+}
